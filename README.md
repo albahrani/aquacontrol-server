@@ -1,13 +1,32 @@
 [![Build Status](https://travis-ci.org/albahrani/aquacontrol-server.svg?branch=master)](https://travis-ci.org/albahrani/aquacontrol-server)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.github.albahrani.aquacontrol:aquacontrol-server)](https://sonarqube.com/dashboard/index/com.github.albahrani.aquacontrol:aquacontrol-server)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.albahrani/aquacontrol-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.albahrani/aquacontrol-server)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.albahrani.aquacontrol/aquacontrol-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.albahrani.aquacontrol/aquacontrol-server)
 ===============
 aquacontrol-server
 ===============
+A pi4j based aquarium management server. It uses the [Pi4J](https://github.com/Pi4J/pi4j) PCA9685GpioProvider to generate PWM signals for light control. It is accessible over REST service interfaces over the integrated [RESTExpress](https://github.com/RestExpress/RestExpress) server.
 
 ## PROJECT INFORMATION
+Project website: https://github.com/albahrani/aquacontrol-server <br />
+Project issues list: https://github.com/albahrani/aquacontrol-server/issues <br />
+<br />
+No releases yet available from Maven Central.
 
-A pi4j based aquarium management server. It uses the [Pi4J](https://github.com/Pi4J/pi4j) PCA9685GpioProvider to generate PWM signals for light control. It is accessible over REST service interfaces over the integrated [RESTExpress](https://github.com/RestExpress/RestExpress) server.
+Snapshot builds are available via
+```xml
+  <dependency>
+    <groupId>com.github.albahrani.aquacontrol</groupId>
+    <artifactId>aquacontrol-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </dependency>
+  ...
+  <repository>
+    <id>sonatype-snapshots-repo</id>
+    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    <releases><enabled>false</enabled></releases>
+    <snapshots><enabled>true</enabled></snapshots>
+  </repository>
+```
 
 ## LICENSE
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +41,8 @@ A pi4j based aquarium management server. It uses the [Pi4J](https://github.com/P
  See the License for the specific language governing permissions and
  limitations under the License.
 
-## Features
-### AquaControl Server JAR
+## USAGE
+### aquacontrol-server JAR
   The AquaControl server shall be packaged in an runnable jar file which can be executed on a Raspberry Pi with an JRE8 or newer.
   For executing the software you need to provide two program arguments.
   * -c *&lt;path_to_configuration&gt;* (Read-only)
@@ -100,6 +119,3 @@ A pi4j based aquarium management server. It uses the [Pi4J](https://github.com/P
  Uploads a new light plan and activates it.
 
 There are several WebServices that are only available when really running on Raspberry Pi. See [pi4j-rest-sysinfo](https://github.com/albahrani/pi4j-rest-sysinfo) for the services available. They are all registered under the baseUri `/raspberry/systeminfo`.
-
-## RELEASES
- No releases available yet.
