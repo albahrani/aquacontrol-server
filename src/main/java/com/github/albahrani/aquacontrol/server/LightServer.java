@@ -45,6 +45,11 @@ import com.pi4j.system.SystemInfo;
  *
  */
 public class LightServer {
+    
+    private LightServer(){
+        //prevent instantiation
+    }
+    
 	public static void main(String[] args) {
 		LightServerArgs cliArguments = parseArgs(args);
 		if (cliArguments == null) {
@@ -112,11 +117,9 @@ public class LightServer {
 	public static DimmingPlan fromJSON(JSONPlan restPlan) {
 		Objects.requireNonNull(restPlan);
 		DimmingPlan plan = DimmingPlan.create();
-		restPlan.getChannels().forEach((restChannel) -> {
+		restPlan.getChannels().forEach(restChannel -> {
 			DimmingPlanChannel channel = plan.channel(restChannel.getId());
-			restChannel.getTimetable().forEach((restTvp) -> {
-				channel.define(restTvp.getTime(), restTvp.getPerc());
-			});
+			restChannel.getTimetable().forEach(restTvp -> channel.define(restTvp.getTime(), restTvp.getPerc()));
 		});
 
 		return plan;
@@ -133,8 +136,7 @@ public class LightServer {
 			pwmControllerConnector = new PWMControllerConnectorDummy();
 		}
 
-		LightEnvironment env = createEnvironmentFromConfiguration(configuration, pwmControllerConnector);
-		return env;
+		return createEnvironmentFromConfiguration(configuration, pwmControllerConnector);
 	}
 
 	static LightEnvironment createEnvironmentFromConfiguration(LightEnvironmentConfiguration configuration, PWMControllerConnector pwmControllerConnector) {
@@ -154,15 +156,12 @@ public class LightServer {
 			return envBuilder.build();
 		}
 
-		channelConfig.stream().map((chConf) -> {
+		channelConfig.stream().map(chConf -> {
 			LightEnvironmentChannelBuilder channelBuilder = LightEnvironmentChannel.create(chConf.getId(), pwmControllerConnector).withName(chConf.getName())
 					.withColor(chConf.getColor());
 			chConf.getPins().forEach(channelBuilder::usePin);
-			LightEnvironmentChannel channel = channelBuilder.build();
-			return channel;
-		}).forEach((channel) -> {
-			envBuilder.withChannel(channel);
-		});
+			return channelBuilder.build();
+		}).forEach(envBuilder::withChannel);
 
 		return envBuilder.build();
 	}

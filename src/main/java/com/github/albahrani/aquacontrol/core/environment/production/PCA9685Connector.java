@@ -79,18 +79,12 @@ public class PCA9685Connector implements PWMControllerConnector {
 	public void setPwmValue(Set<Pin> pinList, int duration) {
 		if (duration == 0) {
 			// switch it off
-			pinList.forEach((pin) -> {
-				this.pca9685.setAlwaysOff(pin);
-			});
+			pinList.forEach(pca9685::setAlwaysOff);
 		} else if (duration == (PCA9685GpioProvider.PWM_STEPS - 1)) {
 			// switch it on
-			pinList.forEach((pin) -> {
-				this.pca9685.setAlwaysOn(pin);
-			});
+			pinList.forEach(pca9685::setAlwaysOn);
 		} else {
-			pinList.forEach((pin) -> {
-				this.pca9685.setPwm(pin, 0, duration);
-			});
+			pinList.forEach(pin -> this.pca9685.setPwm(pin, 0, duration));
 		}
 	}
 

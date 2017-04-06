@@ -39,9 +39,7 @@ public class LightEnvironmentBuilder {
 		LightEnvironment lightEnvironment = new LightEnvironment();
 		lightEnvironment.setPwmControllerConnector(this.pwmControllerConnector);
 
-		this.channels.forEach((channel) -> {
-			lightEnvironment.addChannel(channel.id(), channel);
-		});
+		this.channels.forEach(channel -> lightEnvironment.addChannel(channel.id(), channel));
 
 		return lightEnvironment;
 	}

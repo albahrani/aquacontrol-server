@@ -28,9 +28,6 @@ public class LightTask extends TimerTask {
 
 	private LightTaskDaemon daemon = null;
 
-	public LightTask() {
-	}
-
 	public void setDaemon(LightTaskDaemon daemon) {
 		Objects.requireNonNull(daemon);
 		this.daemon = daemon;
@@ -51,8 +48,8 @@ public class LightTask extends TimerTask {
 		DimmingPlan plan = this.daemon.getLightPlan();
 		LightEnvironment environment = this.daemon.getLightEnvironment();
 		Set<String> channelNames = plan.getChannelNames();
-		channelNames.forEach((channelName) -> {
-			plan.channel(channelName).getPercentage(planTime).ifPresent((percentage) -> environment.channel(channelName).percentage(percentage));
+		channelNames.forEach(channelName -> {
+			plan.channel(channelName).getPercentage(planTime).ifPresent(percentage -> environment.channel(channelName).percentage(percentage));
 		});
 
 	}

@@ -59,15 +59,13 @@ public class LightEnvironmentChannelBuilder {
 		channel.setName(name);
 		channel.setColor(color);
 
-		this.pinNames.stream().map(LightEnvironmentChannelBuilder::findPin).forEach((optionalPin) -> {
-			optionalPin.ifPresent((pin) -> channel.addPin(pin));
-		});
+		this.pinNames.stream().map(LightEnvironmentChannelBuilder::findPin).forEach(optionalPin -> optionalPin.ifPresent(channel::addPin));
 		return channel;
 	}
 
 	private static Optional<Pin> findPin(String pinName) {
 		Objects.requireNonNull(pinName);
 		Pin[] allPins = PCA9685Pin.ALL;
-		return Stream.of(allPins).filter((pin) -> pin.getName().equals(pinName)).findFirst();
+		return Stream.of(allPins).filter(pin -> pin.getName().equals(pinName)).findFirst();
 	}
 }

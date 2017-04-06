@@ -123,8 +123,7 @@ public class LightEnvironmentChannel {
 		}
 
 		if (this.lastValue != null) {
-			double lastValue = this.lastValue;
-			if (Math.abs(lastValue - percentage) < 0.0001) {
+			if (Math.abs(this.lastValue - percentage) < 0.0001) {
 				// nothing to do. reduce I2C messages
 				return;
 			}
@@ -162,7 +161,7 @@ public class LightEnvironmentChannel {
 			retVal = 0;
 		} else if (Math.abs(durationDouble - (PCA9685GpioProvider.PWM_STEPS - 1)) < 0.01) {
 			// switch it on
-			retVal = (PCA9685GpioProvider.PWM_STEPS - 1);
+			retVal = PCA9685GpioProvider.PWM_STEPS - 1;
 		} else {
 			retVal = safeDoubleToInt(durationDouble);
 		}

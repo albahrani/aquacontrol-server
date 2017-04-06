@@ -48,9 +48,7 @@ public class LightTimer {
 	}
 
 	public void stop() {
-		this.task.ifPresent((t) -> {
-			t.cancel();
-		});
+		this.task.ifPresent(LightTask::cancel);
 		this.task = Optional.empty();
 	}
 }

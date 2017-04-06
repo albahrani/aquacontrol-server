@@ -31,6 +31,10 @@ import com.github.albahrani.aquacontrol.server.json.JSONConfigurationChannel;
 
 public class LightServerConfigurationFactory {
 
+    private LightServerConfigurationFactory(){
+        //prevent instantiation
+    }
+
 	public static LightEnvironmentConfiguration loadConfiguration(Reader reader) throws InvalidConfigurationException {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, JSONConfigurationChannel> jsonConfiguration = null;

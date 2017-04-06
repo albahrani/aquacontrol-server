@@ -38,13 +38,9 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 	private Map<Pin, Integer> currentValues = new HashMap<>();
 
 	public PWMControllerConnectorDummy() {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
+		SwingUtilities.invokeLater(() -> {
 				lf.setSize(400, 400);
 				lf.setVisible(true);
-			}
 		});
 	}
 
@@ -57,20 +53,14 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 	 */
 	@Override
 	public void setPwmValue(Set<Pin> pinList, int duration) {
-		pinList.forEach((pin) -> {
-			setPWmValueSinglePin(pin, duration);
-		});
+		pinList.forEach(pin -> setPWmValueSinglePin(pin, duration));
 	}
 
 	private void setPWmValueSinglePin(Pin pin, int duration) {
 		currentValues.put(pin, duration);
 
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
+		SwingUtilities.invokeLater(() -> {
 				lf.setValue(pin, duration);
-			}
 		});
 	}
 
@@ -83,13 +73,9 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 	 */
 	@Override
 	public void shutdown() {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
+		SwingUtilities.invokeLater(() -> {
 				lf.setVisible(false);
 				lf.dispose();
-			}
 		});
 	}
 
@@ -102,12 +88,8 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 	 */
 	@Override
 	public void provisionPwmOutputPin(Pin pin) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
+		SwingUtilities.invokeLater(() -> {
 				lf.setValue(pin, null);
-			}
 		});
 	}
 
