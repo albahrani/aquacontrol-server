@@ -62,6 +62,20 @@ public class LightServerConfigurationFactoryTest {
 			fail("Should throw an InvalidConfigurationException. Has thrown " + e.getClass().getName() + " instead.");
 		}
 	}
+	
+		@Test
+	public void testLoadConfigWithReaderExceptionWithMessage() {
+		Reader reader = mock(Reader.class, new ThrowsException(new IOException("Test exception")));
+		try {
+			LightServerConfigurationFactory.loadConfiguration(reader);
+			fail("Should throw an InvalidConfigurationException.");
+		} catch (InvalidConfigurationException e) {
+			// should reach here
+			assertNotNull(e);
+		} catch (Throwable e) {
+			fail("Should throw an InvalidConfigurationException. Has thrown " + e.getClass().getName() + " instead.");
+		}
+	}
 
 	@Test
 	public void testLoadConfig() {
