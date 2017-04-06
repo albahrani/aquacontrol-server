@@ -31,7 +31,7 @@ public class ServerLifecycleController {
 		this.daemon = daemon;
 	}
 
-	public void shutdown(@SuppressWarnings("unused") Request request, Response response) {
+	public void shutdown(Request request, Response response) {
 		try {
 			this.daemon.shutdown();
 			response.setResponseStatus(HttpResponseStatus.OK);
@@ -42,7 +42,7 @@ public class ServerLifecycleController {
 		}
 	}
 
-	public void pause(@SuppressWarnings("unused") Request request, Response response) {
+	public void pause(Request request, Response response) {
 		try {
 			this.daemon.pause();
 			response.setResponseStatus(HttpResponseStatus.OK);

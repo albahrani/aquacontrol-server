@@ -33,7 +33,9 @@ import com.pi4j.io.gpio.Pin;
 
 public class PWMControllerConnectorDummy implements PWMControllerConnector {
 
-	LightFrame lf = new LightFrame();
+    private LightFrameModel model = new LightFrameModel();
+
+	private JFrame lf = createLightFrame(model);
 
 	private Map<Pin, Integer> currentValues = new HashMap<>();
 
@@ -58,10 +60,7 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 
 	private void setPWmValueSinglePin(Pin pin, int duration) {
 		currentValues.put(pin, duration);
-
-		SwingUtilities.invokeLater(() -> {
-				lf.setValue(pin, duration);
-		});
+		SwingUtilities.invokeLater(() -> model.setValue(pin, duration));
 	}
 
 	/*
@@ -88,31 +87,20 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 	 */
 	@Override
 	public void provisionPwmOutputPin(Pin pin) {
-		SwingUtilities.invokeLater(() -> {
-				lf.setValue(pin, null);
-		});
+		SwingUtilities.invokeLater(() -> model.setValue(pin, null));
 	}
 
-	static class LightFrame extends JFrame {
+    private static JFrame createLightFrame(LightFrameModel model){
+        JFrame frame = new JFrame();
+        frame.setTitle("LightFrame");
+		frame.setLayout(new BorderLayout());
 
-		private static final long serialVersionUID = 1L;
-		private LightFrameModel model = new LightFrameModel();
+		JTable table = new JTable(model);
+		JScrollPane scrollpane = new JScrollPane(table);
 
-		public LightFrame() {
-			this.setTitle("LightFrame");
-			this.setLayout(new BorderLayout());
-
-			JTable table = new JTable(this.model);
-			JScrollPane scrollpane = new JScrollPane(table);
-
-			this.add(scrollpane, BorderLayout.CENTER);
-		}
-
-		public void setValue(Pin pin, Integer duration) {
-			this.model.setValue(pin, duration);
-
-		}
-	}
+		frame.add(scrollpane, BorderLayout.CENTER);
+        return frame;
+    }
 
 	static class LightFrameModel extends AbstractTableModel {
 

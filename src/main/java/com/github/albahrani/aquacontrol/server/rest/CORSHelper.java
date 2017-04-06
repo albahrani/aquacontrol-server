@@ -22,6 +22,11 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class CORSHelper {
+    
+    private CORSHelper(){
+        //prevent instantiation
+    }
+    
 	public static boolean handleCORS(Request request, Response response) {
 		boolean continueProcessing = true;
 		
@@ -32,12 +37,8 @@ public class CORSHelper {
     	response.addHeader("Access-Control-Allow-Origin", origin);
         
         if (HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
-        	 // res.header('Access-Control-Allow-Origin', req.headers.origin);
         	response.addHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
         	response.addHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
-        	//response.addHeader("Access-Control-Allow-Headers", "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Authentication");
-        	//response.addHeader("Access-Control-Allow-Credentials", "false");
-        	//response.addHeader("Access-Control-Max-Age", "86400");
         	response.setResponseStatus(HttpResponseStatus.OK);
         	continueProcessing = false;
         }

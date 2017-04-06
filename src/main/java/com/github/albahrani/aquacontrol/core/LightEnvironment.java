@@ -47,8 +47,7 @@ public class LightEnvironment {
 
 	public LightEnvironmentChannel channel(String channelId) {
 		Objects.requireNonNull(channelId);
-		LightEnvironmentChannel channel = this.channels.get(channelId);
-		return channel;
+		return this.channels.get(channelId);
 	}
 
 	public void shutdown() {

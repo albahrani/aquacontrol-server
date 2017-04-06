@@ -29,9 +29,6 @@ public class RESTServer {
 	private RestExpress server;
 	private LightServerController daemon;
 
-	public RESTServer() {
-	}
-
 	public void setDaemon(LightServerController daemon) {
 		this.daemon = daemon;
 	}

@@ -47,7 +47,7 @@ public class ChannelController {
 			LightEnvironment lightEnvironment = this.daemon.getLightEnvironment();
 
 			Map<String, JSONConfigurationChannel> channelIdsToName = lightEnvironment.channels()
-					.collect(Collectors.toMap(LightEnvironmentChannel::id, (channel) -> {
+					.collect(Collectors.toMap(LightEnvironmentChannel::id, channel -> {
 						JSONConfigurationChannel channelDef = new JSONConfigurationChannel();
 						channelDef.setName(channel.name());
 						channelDef.setPins(channel.pins().map(Pin::getName).collect(Collectors.toList()));

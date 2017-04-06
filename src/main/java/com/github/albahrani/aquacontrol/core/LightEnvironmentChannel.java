@@ -122,11 +122,9 @@ public class LightEnvironmentChannel {
 			return;
 		}
 
-		if (this.lastValue != null) {
-			if (Math.abs(this.lastValue - percentage) < 0.0001) {
-				// nothing to do. reduce I2C messages
-				return;
-			}
+		if ((this.lastValue != null) && (Math.abs(this.lastValue - percentage) < 0.0001)) {
+			// nothing to do. reduce I2C messages
+			return;
 		}
 
 		int duration = calculatePwmDuration(percentage);

@@ -47,8 +47,7 @@ public class LightServerConfigurationFactory {
 			throw new InvalidConfigurationException(e);
 		}
 
-		LightEnvironmentConfiguration configuration = fromJson(jsonConfiguration);
-		return configuration;
+		return fromJson(jsonConfiguration);
 	}
 
 	private static LightEnvironmentConfiguration fromJson(Map<String, JSONConfigurationChannel> orgChannelConfig) {

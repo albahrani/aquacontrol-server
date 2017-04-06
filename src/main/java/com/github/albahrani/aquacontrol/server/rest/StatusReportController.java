@@ -51,11 +51,9 @@ public class StatusReportController {
 			LightEnvironment lightEnvironment = this.daemon.getLightEnvironment();
 			JSONStatusReport report = new JSONStatusReport();
 
-			Set<String> channelIds = lightEnvironment.channels().map((channel) -> {
-				return channel.id();
-			}).collect(Collectors.toSet());
+			Set<String> channelIds = lightEnvironment.channels().map(LightEnvironmentChannel::id).collect(Collectors.toSet());
 
-			Map<String, JSONChannelState> envReport = lightEnvironment.channels().collect(Collectors.toMap(LightEnvironmentChannel::id, (c) -> {
+			Map<String, JSONChannelState> envReport = lightEnvironment.channels().collect(Collectors.toMap(LightEnvironmentChannel::id, c -> {
 				JSONChannelState state = new JSONChannelState();
 				state.setName(c.name());
 				state.setValue(c.lastValue());
@@ -86,7 +84,7 @@ public class StatusReportController {
 	}
 
 	static String formatMemory(long memory) {
-		return String.format("%.2f MB", (memory / 1048576f));
+		return String.format("%.2f MB", memory / 1048576f);
 	}
 
 	static String getUptime() {
