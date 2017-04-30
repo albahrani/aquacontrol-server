@@ -32,6 +32,10 @@ public class ServerLifecycleController {
 	}
 
 	public void shutdown(Request request, Response response) {
+		if (!CORSHelper.handleCORS(request, response)) {
+			return;
+		}
+
 		try {
 			this.daemon.shutdown();
 			response.setResponseStatus(HttpResponseStatus.OK);
@@ -43,6 +47,10 @@ public class ServerLifecycleController {
 	}
 
 	public void pause(Request request, Response response) {
+		if (!CORSHelper.handleCORS(request, response)) {
+			return;
+		}
+
 		try {
 			this.daemon.pause();
 			response.setResponseStatus(HttpResponseStatus.OK);
@@ -53,7 +61,11 @@ public class ServerLifecycleController {
 		}
 	}
 
-	public void resume(@SuppressWarnings("unused") Request request, Response response) {
+	public void resume(Request request, Response response) {
+		if (!CORSHelper.handleCORS(request, response)) {
+			return;
+		}
+
 		try {
 			this.daemon.resume();
 			response.setResponseStatus(HttpResponseStatus.OK);

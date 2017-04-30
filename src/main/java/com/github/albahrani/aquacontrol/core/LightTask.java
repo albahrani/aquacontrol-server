@@ -17,8 +17,6 @@ package com.github.albahrani.aquacontrol.core;
 
 import java.time.LocalTime;
 import java.util.Objects;
-import java.util.OptionalDouble;
-import java.util.Set;
 import java.util.TimerTask;
 
 import org.pmw.tinylog.Logger;
@@ -48,7 +46,6 @@ public class LightTask extends TimerTask {
 		Objects.requireNonNull(planTime);
 		DimmingPlan plan = this.daemon.getLightPlan();
 		LightEnvironment environment = this.daemon.getLightEnvironment();
-		Set<String> channelNames = plan.getChannelNames();
-		channelNames.forEach(channelName -> plan.channel(channelName).getPercentage(planTime).ifPresent(percentage -> environment.channel(channelName).percentage(percentage)));
+		environment.channels().forEach(envChannel -> envChannel.percentage(plan.channel(envChannel.getId()).getPercentage(planTime).orElse(0.0d)));
 	}
 }

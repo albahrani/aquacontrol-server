@@ -16,6 +16,7 @@
 package com.github.albahrani.aquacontrol.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -27,16 +28,13 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.time.LocalTime;
+import java.util.Optional;
 
 import org.junit.Test;
 
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
 import com.github.albahrani.aquacontrol.core.LightTask;
 import com.github.albahrani.aquacontrol.core.LightTimer;
-import com.github.albahrani.aquacontrol.server.LightServer;
-import com.github.albahrani.aquacontrol.server.LightServerArgs;
-import com.github.albahrani.aquacontrol.server.LightServerController;
-import com.github.albahrani.aquacontrol.server.json.JSONPlan;
 import com.github.albahrani.aquacontrol.server.rest.RESTServer;
 import com.github.albahrani.dimmingplan.DimmingPlan;
 import com.github.albahrani.dimmingplan.DimmingPlanChannel;
@@ -50,8 +48,7 @@ public class LightServerControllerTest {
 		LightEnvironment environment = mock(LightEnvironment.class);
 		daemon.setLightEnvironment(environment);
 		DimmingPlan plan = mock(DimmingPlan.class);
-		JSONPlan jsonPlan = mock(JSONPlan.class);
-		daemon.setLightPlan(plan, jsonPlan);
+		daemon.setLightPlan(plan);
 
 		try {
 			LightTask lightTask = new LightTask();
@@ -77,8 +74,8 @@ public class LightServerControllerTest {
 
 		LightServerArgs parseArgs = LightServer.parseArgs(args);
 		assertNotNull(parseArgs);
-		assertEquals(new File("C:/temp/config.json"), parseArgs.getConfigFile());
-		assertEquals(new File("C:/temp/plan.json"), parseArgs.getLightPlanFile());
+		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
+		assertEquals(Optional.of(new File("C:/temp/plan.json")), parseArgs.getLightPlanFile());
 	}
 
 	@Test
@@ -87,7 +84,10 @@ public class LightServerControllerTest {
 		String[] args = new String[] { "-c", "C:/temp/config.json" };
 
 		LightServerArgs parseArgs = LightServer.parseArgs(args);
-		assertNull(parseArgs);
+		assertNotNull(parseArgs);
+		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
+		assertNotNull(parseArgs.getLightPlanFile());
+		assertFalse(parseArgs.getLightPlanFile().isPresent());
 	}
 
 	@Test
@@ -114,16 +114,13 @@ public class LightServerControllerTest {
 		DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
 		when(plan.channel("0x20")).thenReturn(channel);
 
-		JSONPlan jsonPlan = mock(JSONPlan.class);
-
 		LightServerController daemon = new LightServerController();
-		daemon.setLightPlan(plan, jsonPlan);
+		daemon.setLightPlan(plan);
 		daemon.setForcedValue("0x20", 10.0d);
 		verify(plan).channel("0x20");
 		verifyNoMoreInteractions(plan);
 		verify(channel).pin(10.0d);
 		verifyNoMoreInteractions(channel);
-		verifyZeroInteractions(jsonPlan);
 	}
 
 	@Test
@@ -132,16 +129,13 @@ public class LightServerControllerTest {
 		DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
 		when(plan.channel("0x20")).thenReturn(channel);
 
-		JSONPlan jsonPlan = mock(JSONPlan.class);
-
 		LightServerController daemon = new LightServerController();
-		daemon.setLightPlan(plan, jsonPlan);
+		daemon.setLightPlan(plan);
 		daemon.clearForcedValue("0x20");
 		verify(plan).channel("0x20");
 		verifyNoMoreInteractions(plan);
 		verify(channel).unpin();
 		verifyNoMoreInteractions(channel);
-		verifyZeroInteractions(jsonPlan);
 	}
 
 	@Test

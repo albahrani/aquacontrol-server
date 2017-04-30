@@ -17,17 +17,16 @@ package com.github.albahrani.aquacontrol.core;
 
 import static org.junit.Assert.fail;
 import static org.mockito.AdditionalMatchers.eq;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 
@@ -71,7 +70,8 @@ public class LightTaskTest {
 		when(daemon.getLightEnvironment()).thenReturn(environment);
 
 		LightEnvironmentChannel environmentChannel = mock(LightEnvironmentChannel.class);
-		when(environment.channel("0x40")).thenReturn(environmentChannel);
+		when(environment.channels()).thenReturn(Stream.of(environmentChannel));
+		when(environmentChannel.getId()).thenReturn("0x40");
 
 		DimmingPlan plan = mock(DimmingPlan.class);
 		Set<String> channelNames = new HashSet<>();
@@ -87,8 +87,9 @@ public class LightTaskTest {
 		lightTask.setDaemon(daemon);
 
 		lightTask.executePlanFor(time);
-		verify(environment).channel(eq("0x40"));
+		verify(environment).channels();
 		verifyNoMoreInteractions(environment);
+		verify(environmentChannel).getId();
 		verify(environmentChannel).percentage(eq(100.0d, 0.01d));
 		verifyNoMoreInteractions(environmentChannel);
 	}
@@ -96,25 +97,36 @@ public class LightTaskTest {
 	@Test
 	public void testPlanPercentageNotPresent() {
 
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
+		LightEnvironmentChannel envChannel = mock(LightEnvironmentChannel.class);
+		when(envChannel.getId()).thenReturn("0x40");
 
 		LightEnvironment environment = mock(LightEnvironment.class);
-		when(daemon.getLightEnvironment()).thenReturn(environment);
+		when(environment.channels()).thenReturn(Stream.of(envChannel));
+
+		DimmingPlanChannel planChannel = mock(DimmingPlanChannel.class);
+		LocalTime time = LocalTime.of(12, 0);
+		when(planChannel.getPercentage(time)).thenReturn(OptionalDouble.empty());
 
 		DimmingPlan plan = mock(DimmingPlan.class);
-		Set<String> channelNames = new HashSet<>();
-		channelNames.add("0x40");
-		DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
-		when(plan.getChannelNames()).thenReturn(channelNames);
-		when(plan.channel("0x40")).thenReturn(channel);
-		LocalTime time = LocalTime.of(12, 0);
-		when(channel.getPercentage(time)).thenReturn(OptionalDouble.empty());
+		when(plan.channel("0x40")).thenReturn(planChannel);
+
+		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
+		when(daemon.getLightEnvironment()).thenReturn(environment);
 		when(daemon.getLightPlan()).thenReturn(plan);
 
 		LightTask lightTask = new LightTask();
 		lightTask.setDaemon(daemon);
 
 		lightTask.executePlanFor(time);
-		verifyZeroInteractions(environment);
+
+		verify(environment).channels();
+		verifyNoMoreInteractions(environment);
+		verify(envChannel).getId();
+		verify(envChannel).percentage(eq(0.0d, 0.01d));
+		verifyNoMoreInteractions(envChannel);
+		verify(plan).channel("0x40");
+		verifyNoMoreInteractions(plan);
+		verify(planChannel).getPercentage(time);
+		verifyNoMoreInteractions(planChannel);
 	}
 }

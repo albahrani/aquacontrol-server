@@ -16,7 +16,6 @@
 package com.github.albahrani.aquacontrol.server.rest;
 
 import org.restexpress.RestExpress;
-import org.restexpress.pipeline.SimpleConsoleLogMessageObserver;
 
 import com.github.albahrani.aquacontrol.server.LightServer;
 import com.github.albahrani.aquacontrol.server.LightServerController;
@@ -37,26 +36,47 @@ public class RESTServer {
 		this.server = new RestExpress();
 		this.server.setName("LightDaemonRESTServer");
 		this.server.setUseSystemOut(true);
-		this.server.uri("/plan", new PlanController(this.daemon)).action("upload", HttpMethod.POST).action("get", HttpMethod.GET).action("preflight",
-				HttpMethod.OPTIONS);
-		this.server.uri("/channels", new ChannelController(this.daemon)).action("getChannels", HttpMethod.GET).action("preflight", HttpMethod.OPTIONS);
+
+		this.server.uri("/plan", new PlanController(this.daemon))
+				.action("upload", HttpMethod.POST)
+				.action("get", HttpMethod.GET)
+				.action("preflight", HttpMethod.OPTIONS);
+
+		ChannelController channelController = new ChannelController(this.daemon);
+		this.server.uri("/channels", channelController)
+				.action("getChannels", HttpMethod.GET)
+				.action("preflight", HttpMethod.OPTIONS);
+		this.server.uri("/channels/{channelId}", channelController)
+				.action("addChannel", HttpMethod.PUT)
+				.action("preflight", HttpMethod.OPTIONS);
+
 		ServerLifecycleController lifecycleController = new ServerLifecycleController(this.daemon);
-		this.server.uri("/shutdown", lifecycleController).action("shutdown", HttpMethod.PUT);
-		this.server.uri("/pause", lifecycleController).action("pause", HttpMethod.PUT);
-		this.server.uri("/resume", lifecycleController).action("resume", HttpMethod.PUT);
+		this.server.uri("/shutdown", lifecycleController)
+				.action("shutdown", HttpMethod.PUT);
+		this.server.uri("/pause", lifecycleController)
+				.action("pause", HttpMethod.PUT);
+		this.server.uri("/resume", lifecycleController)
+				.action("resume", HttpMethod.PUT);
+
 		ForcedValuesController forcedValueController = new ForcedValuesController(this.daemon);
-		this.server.uri("/channels/{channelId}/force", forcedValueController).action("forceValue", HttpMethod.POST).action("forceValue", HttpMethod.OPTIONS);
-		this.server.uri("/channels/{channelId}/clear", forcedValueController).action("clearForcedValue", HttpMethod.DELETE).action("clearForcedValue",
-				HttpMethod.OPTIONS);
+		this.server.uri("/channels/{channelId}/force", forcedValueController)
+				.action("forceValue", HttpMethod.POST)
+				.action("forceValue", HttpMethod.OPTIONS);
+		this.server.uri("/channels/{channelId}/clear", forcedValueController)
+				.action("clearForcedValue", HttpMethod.DELETE)
+				.action("clearForcedValue", HttpMethod.OPTIONS);
+
 		StatusReportController statusReportController = new StatusReportController(daemon);
-		this.server.uri("/status", statusReportController).action("getStatus", HttpMethod.GET).action("getStatus", HttpMethod.OPTIONS);
+		this.server.uri("/status", statusReportController)
+				.action("getStatus", HttpMethod.GET)
+				.action("getStatus", HttpMethod.OPTIONS);
 
 		if (LightServer.isRunningOnRaspberry()) {
 			RaspberrySystemInfoController raspberrySystemInfoController = new RaspberrySystemInfoController();
 			raspberrySystemInfoController.attach(this.server, "/raspberry/systeminfo");
 		}
 
-		this.server.addMessageObserver(new SimpleConsoleLogMessageObserver());
+		this.server.addMessageObserver(new TinyLogLogMessageObserver());
 
 		this.server.bind();
 	}

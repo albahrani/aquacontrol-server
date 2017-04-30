@@ -37,7 +37,7 @@ public class LightTimer {
 		if (!task.isPresent()) {
 			LightTask newTask = new LightTask();
 			newTask.setDaemon(daemon);
-			timer.scheduleAtFixedRate(newTask, 100, 500);
+			timer.scheduleAtFixedRate(newTask, 100, 1000);
 			this.task = Optional.of(newTask);
 		}
 	}

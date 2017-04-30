@@ -36,7 +36,11 @@ public class LightEnvironment {
 		this.pwmControllerConnector = pwmControllerConnector;
 	}
 
-	void addChannel(String channelId, LightEnvironmentChannel channel) {
+	public PWMControllerConnector getPwmControllerConnector() {
+		return this.pwmControllerConnector;
+	}
+
+	public void addChannel(String channelId, LightEnvironmentChannel channel) {
 		this.channels.put(channelId, channel);
 	}
 

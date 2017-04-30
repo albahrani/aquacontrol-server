@@ -33,10 +33,9 @@ public class LightServerController implements LightTaskDaemon {
 	private RESTServer server;
 	private LightTimer timer;
 	private LightEnvironment lightEnvironment;
+	private LightPlanStorage lightPlanStorage;
 
-	private File lightPlanFile = null;
 	private DimmingPlan lightPlan = null;
-	private JSONPlan jsonLightPlan = null;
 
 	public LightServerController() {
 		this.server = new RESTServer();
@@ -49,24 +48,22 @@ public class LightServerController implements LightTaskDaemon {
 		this.lightEnvironment = lightEnvironment;
 	}
 
-	public void setLightPlanFile(File lightPlanFile) {
-		Objects.requireNonNull(lightPlanFile);
-		this.lightPlanFile = lightPlanFile;
+	public void setLightPlanStorage(LightPlanStorage lightPlanStorage) {
+		Objects.requireNonNull(lightPlanStorage);
+		this.lightPlanStorage = lightPlanStorage;
 	}
 
-	public File getLightPlanFile() {
-		return lightPlanFile;
+	public void loadLightPlanFromFile(File lightPlanFile) {
+		this.lightPlan = this.lightPlanStorage.loadLightPlanFromFile(lightPlanFile);
 	}
 
-	public JSONPlan getJsonLightPlan() {
-		return this.jsonLightPlan;
+	public void updateLightPlan(JSONPlan jsonPlan) {
+		this.lightPlanStorage.setJsonLightPlan(jsonPlan);
+		this.lightPlanStorage.storeLightPlanToFile(this.lightPlanStorage.getLightPlanFile());
 	}
 
-	public void setLightPlan(DimmingPlan lightPlan, JSONPlan jsonLightPlan) {
-		Objects.requireNonNull(lightPlan);
-		Objects.requireNonNull(jsonLightPlan);
+	public void setLightPlan(DimmingPlan lightPlan) {
 		this.lightPlan = lightPlan;
-		this.jsonLightPlan = jsonLightPlan;
 	}
 
 	@Override
@@ -117,5 +114,13 @@ public class LightServerController implements LightTaskDaemon {
 
 	public void clearForcedValue(String channelId) {
 		this.lightPlan.channel(channelId).unpin();
+	}
+
+	public File getLightPlanFile() {
+		return this.lightPlanStorage.getLightPlanFile();
+	}
+
+	public JSONPlan getJsonLightPlan() {
+		return this.lightPlanStorage.getJsonLightPlan();
 	}
 }

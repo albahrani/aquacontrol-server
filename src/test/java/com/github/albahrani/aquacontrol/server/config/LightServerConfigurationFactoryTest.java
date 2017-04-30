@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.mockito.internal.stubbing.answers.ThrowsException;
@@ -39,7 +40,7 @@ public class LightServerConfigurationFactoryTest {
 		File file = new File("§$%&/invalid;:");
 
 		try {
-			LightServerConfigurationFactory.loadConfiguration(file);
+			LightServerConfigurationFactory.loadConfiguration(Optional.of(file));
 			fail("Should throw an InvalidConfigurationException.");
 		} catch (InvalidConfigurationException e) {
 			// should reach here
@@ -62,8 +63,8 @@ public class LightServerConfigurationFactoryTest {
 			fail("Should throw an InvalidConfigurationException. Has thrown " + e.getClass().getName() + " instead.");
 		}
 	}
-	
-		@Test
+
+	@Test
 	public void testLoadConfigWithReaderExceptionWithMessage() {
 		Reader reader = mock(Reader.class, new ThrowsException(new IOException("Test exception")));
 		try {

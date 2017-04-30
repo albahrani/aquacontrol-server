@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,9 +32,9 @@ import com.github.albahrani.aquacontrol.server.json.JSONConfigurationChannel;
 
 public class LightServerConfigurationFactory {
 
-    private LightServerConfigurationFactory(){
-        //prevent instantiation
-    }
+	private LightServerConfigurationFactory() {
+		// prevent instantiation
+	}
 
 	public static LightEnvironmentConfiguration loadConfiguration(Reader reader) throws InvalidConfigurationException {
 		ObjectMapper mapper = new ObjectMapper();
@@ -68,12 +69,16 @@ public class LightServerConfigurationFactory {
 
 	}
 
-	public static LightEnvironmentConfiguration loadConfiguration(File file) throws InvalidConfigurationException {
+	public static LightEnvironmentConfiguration loadConfiguration(Optional<File> file) throws InvalidConfigurationException {
 		LightEnvironmentConfiguration configuration = null;
-		try (FileReader reader = new FileReader(file)) {
-			configuration = loadConfiguration(reader);
-		} catch (IOException e) {
-			throw new InvalidConfigurationException(e);
+		if (file.isPresent()) {
+			try (FileReader reader = new FileReader(file.get())) {
+				configuration = loadConfiguration(reader);
+			} catch (IOException e) {
+				throw new InvalidConfigurationException(e);
+			}
+		} else {
+			configuration = new LightEnvironmentConfiguration();
 		}
 
 		return configuration;

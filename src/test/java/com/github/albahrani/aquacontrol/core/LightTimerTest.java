@@ -26,10 +26,6 @@ import java.util.Timer;
 
 import org.junit.Test;
 
-import com.github.albahrani.aquacontrol.core.LightTask;
-import com.github.albahrani.aquacontrol.core.LightTaskDaemon;
-import com.github.albahrani.aquacontrol.core.LightTimer;
-
 public class LightTimerTest {
 
 	@Test
@@ -42,7 +38,7 @@ public class LightTimerTest {
 
 		lightTimer.start(daemon);
 
-		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(500l));
+		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(1000l));
 		verifyNoMoreInteractions(timer);
 		verifyZeroInteractions(daemon);
 	}
@@ -58,7 +54,7 @@ public class LightTimerTest {
 		lightTimer.start(daemon);
 		lightTimer.start(daemon);
 
-		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(500l));
+		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(1000l));
 		verifyNoMoreInteractions(timer);
 		verifyZeroInteractions(daemon);
 	}
@@ -88,7 +84,7 @@ public class LightTimerTest {
 		lightTimer.start(daemon);
 		lightTimer.stop();
 
-		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(500l));
+		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(1000l));
 		verifyNoMoreInteractions(timer);
 		verifyZeroInteractions(daemon);
 	}

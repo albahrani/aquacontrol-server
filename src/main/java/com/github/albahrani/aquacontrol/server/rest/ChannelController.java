@@ -24,6 +24,7 @@ import org.restexpress.Response;
 
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
 import com.github.albahrani.aquacontrol.core.LightEnvironmentChannel;
+import com.github.albahrani.aquacontrol.core.LightEnvironmentChannelBuilder;
 import com.github.albahrani.aquacontrol.server.LightServerController;
 import com.github.albahrani.aquacontrol.server.json.JSONConfigurationChannel;
 import com.pi4j.io.gpio.Pin;
@@ -55,6 +56,30 @@ public class ChannelController {
 					}));
 
 			response.setBody(channelIdsToName);
+			response.setResponseStatus(HttpResponseStatus.OK);
+		} catch (Exception e) {
+			Logger.error(e, "Unexpected error.");
+			response.setException(e);
+		}
+	}
+
+	public void addChannel(Request request, Response response) {
+		if (!CORSHelper.handleCORS(request, response)) {
+			return;
+		}
+
+		try {
+			String channelId = request.getHeader("channelId", "Channel Id is missing.");
+			JSONConfigurationChannel channelDef = request.getBodyAs(JSONConfigurationChannel.class);
+
+			LightEnvironment lightEnvironment = this.daemon.getLightEnvironment();
+			LightEnvironmentChannelBuilder channelBuilder = LightEnvironmentChannel
+					.create(channelId, lightEnvironment.getPwmControllerConnector())
+					.withName(channelDef.getName())
+					.withColor(channelDef.getColor());
+			channelDef.getPins().forEach(pinName -> channelBuilder.usePin(pinName));
+			lightEnvironment.addChannel(channelId, channelBuilder.build());
+
 			response.setResponseStatus(HttpResponseStatus.OK);
 		} catch (Exception e) {
 			Logger.error(e, "Unexpected error.");

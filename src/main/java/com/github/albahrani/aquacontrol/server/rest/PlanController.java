@@ -15,22 +15,12 @@
  */
 package com.github.albahrani.aquacontrol.server.rest;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-
 import org.pmw.tinylog.Logger;
 import org.restexpress.Request;
 import org.restexpress.Response;
 
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.albahrani.aquacontrol.server.LightServer;
 import com.github.albahrani.aquacontrol.server.LightServerController;
 import com.github.albahrani.aquacontrol.server.json.JSONPlan;
-import com.github.albahrani.dimmingplan.DimmingPlan;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -49,41 +39,15 @@ public class PlanController {
 
 		try {
 
-			JSONPlan restPlan = request.getBodyAs(JSONPlan.class);
+			JSONPlan jsonPlan = request.getBodyAs(JSONPlan.class);
+			this.daemon.updateLightPlan(jsonPlan);
 
-			DimmingPlan lightPlan = LightServer.fromJSON(restPlan);
-			this.daemon.setLightPlan(lightPlan, restPlan);
-
-			this.store(restPlan, this.daemon.getLightPlanFile());
 			response.setResponseStatus(HttpResponseStatus.OK);
 
 		} catch (Exception t) {
 			Logger.error(t, "Unexpected error.");
 			response.setException(t);
 		}
-	}
-
-	private boolean store(JSONPlan restPlan, File lightPlanPath) {
-		boolean success = false;
-		try (FileWriter writer = new FileWriter(lightPlanPath)) {
-			success = this.write(restPlan, writer);
-		} catch (IOException e) {
-			Logger.error(e, "Error storing plan to file {}.", lightPlanPath);
-		}
-		return success;
-	}
-
-	public boolean write(JSONPlan restPlan, Writer writer) {
-		boolean success = false;
-		ObjectMapper jacksonMapper = new ObjectMapper();
-		ObjectWriter jacksonWriter = jacksonMapper.writer(new DefaultPrettyPrinter());
-		try {
-			jacksonWriter.writeValue(writer, restPlan);
-			success = true;
-		} catch (IOException e) {
-			Logger.error(e, "Error writing plan to writer.");
-		}
-		return success;
 	}
 
 	public void get(Request request, Response response) {

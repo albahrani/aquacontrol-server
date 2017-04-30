@@ -16,6 +16,7 @@
 package com.github.albahrani.aquacontrol.server;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -26,11 +27,11 @@ public class LightServerArgs {
 
 	private CmdLineParser parser = new CmdLineParser(this);
 
-	@Option(name = "-c", aliases = { "--config" }, required = true, usage = "configuration file of the daemon")
+	@Option(name = "-c", aliases = { "--config" }, required = false, usage = "configuration file of the daemon")
 	private File configFile;
 
 	@Option(name = "-p", aliases = {
-			"--plan" }, required = true, usage = "file used to read/write the file plan from/to. You need write permission to this file!")
+			"--plan" }, required = false, usage = "file used to read/write the file plan from/to. You need write permission to this file!")
 	private File lightPlanFile;
 
 	@Option(name = "-h", aliases = { "--help" }, usage = "shows this help", help = true)
@@ -49,12 +50,12 @@ public class LightServerArgs {
 		return true;
 	}
 
-	public File getConfigFile() {
-		return configFile;
+	public Optional<File> getConfigFile() {
+		return Optional.ofNullable(configFile);
 	}
 
-	public File getLightPlanFile() {
-		return lightPlanFile;
+	public Optional<File> getLightPlanFile() {
+		return Optional.ofNullable(lightPlanFile);
 	}
 
 	public void setConfigFile(File configPath) {

@@ -45,11 +45,11 @@ import com.pi4j.system.SystemInfo;
  *
  */
 public class LightServer {
-    
-    private LightServer(){
-        //prevent instantiation
-    }
-    
+
+	private LightServer() {
+		// prevent instantiation
+	}
+
 	public static void main(String[] args) {
 		LightServerArgs cliArguments = parseArgs(args);
 		if (cliArguments == null) {
@@ -76,7 +76,10 @@ public class LightServer {
 		LightServerController daemon = new LightServerController();
 		Runtime.getRuntime().addShutdownHook(new LightDaemonShutdownHook(daemon));
 
-		daemon.setLightPlanFile(cliArguments.getLightPlanFile());
+		daemon.setLightPlanStorage(new LightPlanStorage());
+		File lightPlanFile = cliArguments.getLightPlanFile().orElse(new File("./aquacontrol-server_lightplan.json"));
+		Logger.info("Using " + lightPlanFile.getAbsolutePath() + " for storing the active lightPlan.");
+		daemon.loadLightPlanFromFile(lightPlanFile);
 
 		boolean runningOnRaspberry = isRunningOnRaspberry();
 
@@ -85,9 +88,6 @@ public class LightServer {
 		daemon.setLightEnvironment(env);
 
 		// Init plan
-		JSONPlan jsonPlan = readLightPlanFile(cliArguments.getLightPlanFile()).orElse(new JSONPlan());
-		DimmingPlan plan = fromJSON(jsonPlan);
-		daemon.setLightPlan(plan, jsonPlan);
 		daemon.start();
 
 	}
@@ -102,14 +102,15 @@ public class LightServer {
 		return cliArguments;
 	}
 
-	private static Optional<JSONPlan> readLightPlanFile(File lightPlanFile) {
-		Objects.requireNonNull(lightPlanFile);
+	public static Optional<JSONPlan> readLightPlanFile(Optional<File> lightPlanFile) {
 		Optional<JSONPlan> restPlan = Optional.empty();
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			restPlan = Optional.of(mapper.readValue(lightPlanFile, JSONPlan.class));
-		} catch (IOException e) {
-			Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
+		if (lightPlanFile.isPresent()) {
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				restPlan = Optional.of(mapper.readValue(lightPlanFile.get(), JSONPlan.class));
+			} catch (IOException e) {
+				Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
+			}
 		}
 		return restPlan;
 	}
@@ -147,12 +148,12 @@ public class LightServer {
 
 		List<LightEnvironmentChannelConfiguration> channelConfig = configuration.getChannelConfig();
 		if (channelConfig == null) {
-			Logger.error("Light environment configuration has no channels configured.");
+			Logger.warn("Light environment configuration has no channels configured.");
 			return envBuilder.build();
 		}
 
 		if (channelConfig.isEmpty()) {
-			Logger.error("Light environment configuration has no channels configured.");
+			Logger.warn("Light environment configuration has no channels configured.");
 			return envBuilder.build();
 		}
 
