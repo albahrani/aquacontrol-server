@@ -51,6 +51,7 @@ public class ChannelController {
 					.collect(Collectors.toMap(LightEnvironmentChannel::id, channel -> {
 						JSONConfigurationChannel channelDef = new JSONConfigurationChannel();
 						channelDef.setName(channel.name());
+						channelDef.setColor(channel.color());
 						channelDef.setPins(channel.pins().map(Pin::getName).collect(Collectors.toList()));
 						return channelDef;
 					}));
@@ -77,7 +78,7 @@ public class ChannelController {
 					.create(channelId, lightEnvironment.getPwmControllerConnector())
 					.withName(channelDef.getName())
 					.withColor(channelDef.getColor());
-			channelDef.getPins().forEach(pinName -> channelBuilder.usePin(pinName));
+			channelDef.getPins().forEach(channelBuilder::usePin);
 			lightEnvironment.addChannel(channelId, channelBuilder.build());
 
 			response.setResponseStatus(HttpResponseStatus.OK);
