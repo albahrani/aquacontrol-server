@@ -15,17 +15,12 @@
  */
 package com.github.albahrani.aquacontrol.server;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.pmw.tinylog.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
 import com.github.albahrani.aquacontrol.core.LightEnvironmentBuilder;
 import com.github.albahrani.aquacontrol.core.LightEnvironmentChannel;
@@ -37,9 +32,6 @@ import com.github.albahrani.aquacontrol.core.environment.dummy.PWMControllerConn
 import com.github.albahrani.aquacontrol.core.environment.production.PCA9685Connector;
 import com.github.albahrani.aquacontrol.server.config.InvalidConfigurationException;
 import com.github.albahrani.aquacontrol.server.config.LightServerConfigurationFactory;
-import com.github.albahrani.aquacontrol.server.json.JSONPlan;
-import com.github.albahrani.dimmingplan.DimmingPlan;
-import com.github.albahrani.dimmingplan.DimmingPlanChannel;
 import com.pi4j.system.SystemInfo;
 
 /**
@@ -53,107 +45,72 @@ public class LightServer {
 	}
 
 	public static void main(String[] args) {
-		LightServerArgs cliArguments = parseArgs(args);
-		if (cliArguments == null) {
-			return;
-		}
-		if (cliArguments.isShowUsage()) {
-			cliArguments.showUsage();
-			Logger.error("Usage information is shown. Not starting application.");
-			return;
-		}
-
-		LightEnvironmentConfiguration configuration = null;
-		try {
-			configuration = LightServerConfigurationFactory.loadConfiguration(cliArguments.getConfigFile());
-			if (configuration == null) {
-				Logger.error("Configuration could not be loaded from '{}'.", cliArguments.getConfigFile());
-				return;
-			}
-		} catch (InvalidConfigurationException e) {
-			Logger.error(e, "Configuration could not be loaded from '{}'.", cliArguments.getConfigFile());
-			return;
-		}
-
-		LightServerController daemon = new LightServerController();
-		Runtime.getRuntime().addShutdownHook(new LightDaemonShutdownHook(daemon));
-
-		daemon.setLightPlanStorage(new LightPlanStorage());
-		File lightPlanFile = cliArguments.getLightPlanFile().orElse(new File("./aquacontrol-server_lightplan.json"));
-		Logger.info("Using " + lightPlanFile.getAbsolutePath() + " for storing the active lightPlan.");
-		daemon.loadLightPlanFromFile(lightPlanFile);
-
-		boolean runningOnRaspberry = isRunningOnRaspberry();
-
-		// Init light environment
-		LightEnvironment env = initLightEnvironemnt(configuration, runningOnRaspberry);
-		daemon.setLightEnvironment(env);
-
-		// Init plan
-		daemon.start();
-
-	}
-
-	public static LightServerArgs parseArgs(String[] args) {
-		LightServerArgs cliArguments = new LightServerArgs();
-		boolean parse = cliArguments.parse(args);
-		if (!parse) {
-			return null;
-		}
-
-		return cliArguments;
-	}
-
-	public static Optional<JSONPlan> readLightPlanFile(Optional<File> lightPlanFile) {
 		
-		return lightPlanFile.flatMap(file -> {
-			Optional<JSONPlan> jsonPlan = Optional.empty();	
-			try(FileInputStream fis = new FileInputStream(file)){
-				jsonPlan = LightServer.readLightPlanInputStream(fis);
-			} catch (IOException e) {
-				Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);	
-			}
-			return jsonPlan;
-		});
-	}
-	
-	public static Optional<JSONPlan> readLightPlanInputStream(InputStream lightPlanFile) {
-		Optional<JSONPlan> restPlan = Optional.empty();
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			restPlan = Optional.of(mapper.readValue(lightPlanFile, JSONPlan.class));
-		} catch (IOException e) {
-			Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
-		}
-		return restPlan;
-	}
-
-	public static DimmingPlan fromJSON(JSONPlan restPlan) {
-		Objects.requireNonNull(restPlan);
-		DimmingPlan plan = DimmingPlan.create();
-		restPlan.getChannels().forEach(restChannel -> {
-			DimmingPlanChannel channel = plan.channel(restChannel.getId());
-			restChannel.getTimetable().forEach(restTvp -> channel.define(restTvp.getTime(), restTvp.getPerc()));
-		});
-
-		return plan;
-	}
-
-	private static LightEnvironment initLightEnvironemnt(LightEnvironmentConfiguration configuration, boolean runningOnRaspberry) {
-		Objects.requireNonNull(configuration);
 		PWMControllerConnector pwmControllerConnector;
-		if (runningOnRaspberry) {
+		if (isRunningOnRaspberry()) {
 			Logger.info("Running on Pi.");
 			pwmControllerConnector = new PCA9685Connector();
 		} else {
 			Logger.info("NOT running on Pi!");
 			pwmControllerConnector = new PWMControllerConnectorDummy();
 		}
+		
+		Optional<LightServerController> optionalServer = initLightServer(args, pwmControllerConnector);
+		optionalServer.ifPresent(LightServerController::start);
+	}
 
+	static Optional<LightServerController> initLightServer(String[] args, PWMControllerConnector pwmControllerConnector) {
+		Optional<LightServerArgs> optionalCliArguments = parseArgs(args);
+		if (!optionalCliArguments.isPresent()) {
+			return Optional.empty();
+		}
+		LightServerArgs cliArguments = optionalCliArguments.get();
+
+		LightEnvironmentConfiguration configuration = new LightEnvironmentConfiguration();
+		try {
+			configuration = LightServerConfigurationFactory.loadConfiguration(cliArguments.getConfigFile());
+		} catch (InvalidConfigurationException e) {
+			Logger.error(e, "Configuration could not be loaded from '{}'. Not starting application.",
+					cliArguments.getConfigFile());
+			return Optional.empty();
+		}
+
+		LightServerController daemon = new LightServerController();
+		Runtime.getRuntime().addShutdownHook(new LightDaemonShutdownHook(daemon));
+
+		daemon.setLightPlanStorage(new LightPlanStorage());
+		daemon.loadLightPlanFromFile(cliArguments.getLightPlanFile());
+
+		LightEnvironment env = initLightEnvironemnt(configuration, pwmControllerConnector);
+		daemon.setLightEnvironment(env);
+
+		return Optional.of(daemon);
+	}
+
+	static Optional<LightServerArgs> parseArgs(String[] args) {
+		LightServerArgs cliArguments = new LightServerArgs();
+		boolean parse = cliArguments.parse(args);
+		if (!parse) {
+			Logger.error("Error while parsing cli arguments. Not starting application.");
+			return Optional.empty();
+		}
+
+		if (cliArguments.isShowUsage()) {
+			cliArguments.showUsage();
+			Logger.info("Usage information is shown. Not starting application.");
+			return Optional.empty();
+		}
+
+		return Optional.of(cliArguments);
+	}
+
+	private static LightEnvironment initLightEnvironemnt(LightEnvironmentConfiguration configuration, PWMControllerConnector pwmControllerConnector) {
+		Objects.requireNonNull(configuration);
 		return createEnvironmentFromConfiguration(configuration, pwmControllerConnector);
 	}
 
-	static LightEnvironment createEnvironmentFromConfiguration(LightEnvironmentConfiguration configuration, PWMControllerConnector pwmControllerConnector) {
+	static LightEnvironment createEnvironmentFromConfiguration(LightEnvironmentConfiguration configuration,
+			PWMControllerConnector pwmControllerConnector) {
 		Objects.requireNonNull(configuration);
 		Objects.requireNonNull(pwmControllerConnector);
 
@@ -171,7 +128,8 @@ public class LightServer {
 		}
 
 		channelConfig.stream().map(chConf -> {
-			LightEnvironmentChannelBuilder channelBuilder = LightEnvironmentChannel.create(chConf.getId(), pwmControllerConnector).withName(chConf.getName())
+			LightEnvironmentChannelBuilder channelBuilder = LightEnvironmentChannel
+					.create(chConf.getId(), pwmControllerConnector).withName(chConf.getName())
 					.withColor(chConf.getColor());
 			chConf.getPins().forEach(channelBuilder::usePin);
 			return channelBuilder.build();

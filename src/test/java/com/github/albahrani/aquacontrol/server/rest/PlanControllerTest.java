@@ -15,12 +15,13 @@
  */
 package com.github.albahrani.aquacontrol.server.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import java.io.File;
 
 import org.junit.Test;
 import org.restexpress.Request;
@@ -34,10 +35,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 public class PlanControllerTest {
 
 	@Test
-	public void test() {
+	public void testUpload() {
 		LightServerController daemon = mock(LightServerController.class);
-		File planFile = new File("planFile");
-		when(daemon.getLightPlanFile()).thenReturn(planFile);
 		PlanController controller = new PlanController(daemon);
 		Request request = mock(Request.class);
 		JSONPlan jsonPlan = new JSONPlan();
@@ -49,5 +48,25 @@ public class PlanControllerTest {
 		verify(daemon).updateLightPlan(jsonPlan);
 		verifyNoMoreInteractions(daemon);
 		verify(response).setResponseStatus(HttpResponseStatus.OK);
+	}
+
+	@Test
+	public void testGet() {
+		LightServerController daemon = mock(LightServerController.class);
+		JSONPlan jsonPlan = new JSONPlan();
+		when(daemon.getJsonLightPlan()).thenReturn(jsonPlan);
+
+		Request request = mock(Request.class);
+		Response response = new Response();
+
+		PlanController controller = new PlanController(daemon);
+		controller.get(request, response);
+
+		assertEquals(HttpResponseStatus.OK, response.getResponseStatus());
+		Object responseBody = response.getBody();
+		assertNotNull(responseBody);
+		assertTrue(responseBody instanceof JSONPlan);
+		JSONPlan responseJsonPlan = (JSONPlan) responseBody;
+		assertEquals(jsonPlan, responseJsonPlan);
 	}
 }

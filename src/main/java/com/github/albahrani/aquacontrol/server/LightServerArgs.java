@@ -27,7 +27,7 @@ public class LightServerArgs {
 
 	private CmdLineParser parser = new CmdLineParser(this);
 
-	@Option(name = "-c", aliases = { "--config" }, required = false, usage = "configuration file of the daemon")
+	@Option(name = "-c", aliases = { "--config" }, required = false, usage = "environment configuration file of the daemon")
 	private File configFile;
 
 	@Option(name = "-p", aliases = {
@@ -40,6 +40,19 @@ public class LightServerArgs {
 	public boolean parse(String[] args) {
 		try {
 			parser.parseArgument(args);
+			
+			if(this.configFile != null) {
+				Logger.info("Using " + configFile.getAbsolutePath() + " for storing the environment configuration.");
+			} else {
+				Logger.warn("No location defined for storing the environment configuration. All configured data will be lost after restart! For production define a environment configuration file using -c / --config parameter.");
+			}
+			
+			if(this.lightPlanFile != null) {
+				Logger.info("Using " + lightPlanFile.getAbsolutePath() + " for storing the active lightPlan.");
+			} else {
+				Logger.warn("No location defined for storing the lightPlan. All configured data will be lost after restart! For production define a plan file location using -p / --plan parameter.");
+			}
+			
 		} catch (CmdLineException e) {
 			Logger.error(e, "Invalid arguments for lightdaemon.");
 			System.err.println(e.getMessage());

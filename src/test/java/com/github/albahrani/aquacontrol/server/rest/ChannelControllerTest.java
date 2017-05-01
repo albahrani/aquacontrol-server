@@ -18,27 +18,35 @@ package com.github.albahrani.aquacontrol.server.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.restexpress.Request;
 import org.restexpress.Response;
 
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
 import com.github.albahrani.aquacontrol.core.LightEnvironmentChannel;
+import com.github.albahrani.aquacontrol.core.environment.PWMControllerConnector;
 import com.github.albahrani.aquacontrol.server.LightServerController;
 import com.github.albahrani.aquacontrol.server.json.JSONConfigurationChannel;
 import com.pi4j.gpio.extension.pca.PCA9685Pin;
+import com.pi4j.io.gpio.Pin;
+
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class ChannelControllerTest {
 
 	@Test
-	public void test() {
+	public void testGetChannels() {
 		LightServerController daemon = mock(LightServerController.class);
 		LightEnvironment lightEnv = mock(LightEnvironment.class);
 		LightEnvironmentChannel channel1 = mock(LightEnvironmentChannel.class);
@@ -83,4 +91,43 @@ public class ChannelControllerTest {
 		assertTrue(pins2.contains(PCA9685Pin.PWM_02.getName()));
 	}
 
+	@Test
+	public void testAddChannel() {
+		PWMControllerConnector pwmConn = mock(PWMControllerConnector.class);
+
+		LightEnvironment lightEnv = mock(LightEnvironment.class);
+		when(lightEnv.getPwmControllerConnector()).thenReturn(pwmConn);
+
+		LightServerController daemon = mock(LightServerController.class);
+		when(daemon.getLightEnvironment()).thenReturn(lightEnv);
+
+		JSONConfigurationChannel jsonChannel = mock(JSONConfigurationChannel.class);
+		when(jsonChannel.getName()).thenReturn("White");
+		when(jsonChannel.getColor()).thenReturn("#000000");
+		List<String> pins = new ArrayList<>();
+		pins.add("PWM 1");
+		pins.add("PWM 2");
+		when(jsonChannel.getPins()).thenReturn(pins);
+
+		Request request = mock(Request.class);
+		when(request.getHeader("channelId", "Channel Id is missing.")).thenReturn("white");
+		when(request.getBodyAs(JSONConfigurationChannel.class)).thenReturn(jsonChannel);
+
+		Response response = new Response();
+
+		ChannelController controller = new ChannelController(daemon);
+		controller.addChannel(request, response);
+
+		assertEquals(HttpResponseStatus.OK, response.getResponseStatus());
+
+		ArgumentCaptor<LightEnvironmentChannel> lightChannel = ArgumentCaptor.forClass(LightEnvironmentChannel.class);
+		verify(lightEnv).addChannel(eq("white"), lightChannel.capture());
+		assertEquals("White", lightChannel.getValue().name());
+		assertEquals("#000000", lightChannel.getValue().color());
+		Stream<Pin> lightChannelPins = lightChannel.getValue().pins();
+		assertTrue(lightChannelPins.allMatch(p -> {
+			return PCA9685Pin.PWM_01.equals(p) || PCA9685Pin.PWM_02.equals(p);
+		}));
+
+	}
 }

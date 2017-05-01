@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.pmw.tinylog.Logger;
 
@@ -34,10 +35,10 @@ import com.github.albahrani.dimmingplan.DimmingPlanChannel;
 
 public class LightPlanStorage {
 
-	private File lightPlanFile;
-	private JSONPlan jsonLightPlan;
+	private Optional<File> lightPlanFile = Optional.empty();
+	private JSONPlan jsonLightPlan = new JSONPlan();
 
-	public File getLightPlanFile() {
+	public Optional<File> getLightPlanFile() {
 		return this.lightPlanFile;
 	}
 
@@ -46,13 +47,17 @@ public class LightPlanStorage {
 		return mapper.readValue(lightPlanInputStream, JSONPlan.class);
 	}
 
-	public DimmingPlan loadLightPlanFromFile(File lightPlanFile) {
+	public DimmingPlan loadLightPlanFromFile(Optional<File> lightPlanFile) {
 		this.lightPlanFile = lightPlanFile;
 
-		try (FileInputStream fis = new FileInputStream(lightPlanFile)) {
-			this.jsonLightPlan = this.read(fis);
-		} catch (IOException e) {
-			Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
+		if (lightPlanFile.isPresent()) {
+			try (FileInputStream fis = new FileInputStream(lightPlanFile.get())) {
+				this.jsonLightPlan = this.read(fis);
+			} catch (IOException e) {
+				Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
+				this.jsonLightPlan = new JSONPlan();
+			}
+		} else {
 			this.jsonLightPlan = new JSONPlan();
 		}
 
@@ -70,22 +75,36 @@ public class LightPlanStorage {
 		return plan;
 	}
 
-	public boolean storeLightPlanToFile(File lightPlanPath) {
+	public boolean storeLightPlanToFile(Optional<File> lightPlanPath) {
 		this.lightPlanFile = lightPlanPath;
 		boolean success = false;
-		try (FileWriter writer = new FileWriter(this.lightPlanFile)) {
-			this.write(this.jsonLightPlan, writer);
+		
+		if (this.lightPlanFile.isPresent()) {
+			try (FileWriter writer = new FileWriter(this.lightPlanFile.get())) {
+				success = this.write(this.jsonLightPlan, writer);
+			} catch (IOException e) {
+				Logger.error(e, "Error in FileWriter storing plan to file {}.", this.lightPlanFile);
+			}
+		} else {
 			success = true;
-		} catch (IOException e) {
-			Logger.error(e, "Error storing plan to file {}.", this.lightPlanFile);
 		}
 		return success;
 	}
 
-	public void write(JSONPlan restPlan, Writer writer) throws IOException {
+	public boolean write(JSONPlan restPlan, Writer writer) {
+		boolean success = false;
+
 		ObjectMapper jacksonMapper = new ObjectMapper();
 		ObjectWriter jacksonWriter = jacksonMapper.writer(new DefaultPrettyPrinter());
-		jacksonWriter.writeValue(writer, restPlan);
+		
+		try{
+			jacksonWriter.writeValue(writer, restPlan);
+			success = true;
+		} catch(IOException e) {
+			Logger.error(e, "Error in jackson storing plan to file {}.", this.lightPlanFile);
+		}
+		
+		return success;
 	}
 
 	public void setJsonLightPlan(JSONPlan jsonLightPlan) {

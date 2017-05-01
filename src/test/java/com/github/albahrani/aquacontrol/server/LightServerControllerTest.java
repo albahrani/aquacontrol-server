@@ -18,7 +18,7 @@ package com.github.albahrani.aquacontrol.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -73,7 +73,10 @@ public class LightServerControllerTest {
 
 		String[] args = new String[] { "-c", "C:/temp/config.json", "-p", "C:/temp/plan.json" };
 
-		LightServerArgs parseArgs = LightServer.parseArgs(args);
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertTrue(optionalParseArgs.isPresent());
+		LightServerArgs parseArgs = optionalParseArgs.get();
 		assertNotNull(parseArgs);
 		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
 		assertEquals(Optional.of(new File("C:/temp/plan.json")), parseArgs.getLightPlanFile());
@@ -84,7 +87,10 @@ public class LightServerControllerTest {
 
 		String[] args = new String[] { "-c", "C:/temp/config.json" };
 
-		LightServerArgs parseArgs = LightServer.parseArgs(args);
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertTrue(optionalParseArgs.isPresent());
+		LightServerArgs parseArgs = optionalParseArgs.get();
 		assertNotNull(parseArgs);
 		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
 		assertNotNull(parseArgs.getLightPlanFile());
@@ -96,8 +102,9 @@ public class LightServerControllerTest {
 
 		String[] args = new String[] { "-c", "C:/temp/config.json", "-p", "C:/temp/plan.json", "-x", "Wrong" };
 
-		LightServerArgs parseArgs = LightServer.parseArgs(args);
-		assertNull(parseArgs);
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertFalse(optionalParseArgs.isPresent());
 	}
 
 	@Test
@@ -105,8 +112,9 @@ public class LightServerControllerTest {
 
 		String[] args = new String[] { "-h" };
 
-		LightServerArgs parseArgs = LightServer.parseArgs(args);
-		assertNotNull(parseArgs);
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertFalse(optionalParseArgs.isPresent());
 	}
 
 	@Test
@@ -209,7 +217,7 @@ public class LightServerControllerTest {
 	public void testUpdateLightPlan() {
 		
 		LightPlanStorage lightPlanStorage = mock(LightPlanStorage.class);
-		File file = new File("test");
+		Optional<File> file = Optional.of(new File("test"));
 		when(lightPlanStorage.getLightPlanFile()).thenReturn(file);
 		JSONPlan jsonPlan = mock(JSONPlan.class);
 		

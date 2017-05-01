@@ -70,15 +70,13 @@ public class LightServerConfigurationFactory {
 	}
 
 	public static LightEnvironmentConfiguration loadConfiguration(Optional<File> file) throws InvalidConfigurationException {
-		LightEnvironmentConfiguration configuration = null;
+		LightEnvironmentConfiguration configuration = new LightEnvironmentConfiguration();
 		if (file.isPresent()) {
 			try (FileReader reader = new FileReader(file.get())) {
 				configuration = loadConfiguration(reader);
 			} catch (IOException e) {
 				throw new InvalidConfigurationException(e);
 			}
-		} else {
-			configuration = new LightEnvironmentConfiguration();
 		}
 
 		return configuration;

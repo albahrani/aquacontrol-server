@@ -17,6 +17,7 @@ package com.github.albahrani.aquacontrol.server;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
 import com.github.albahrani.aquacontrol.core.LightTaskDaemon;
@@ -53,7 +54,7 @@ public class LightServerController implements LightTaskDaemon {
 		this.lightPlanStorage = lightPlanStorage;
 	}
 
-	public void loadLightPlanFromFile(File lightPlanFile) {
+	public void loadLightPlanFromFile(Optional<File> lightPlanFile) {
 		this.lightPlan = this.lightPlanStorage.loadLightPlanFromFile(lightPlanFile);
 	}
 
@@ -62,7 +63,7 @@ public class LightServerController implements LightTaskDaemon {
 		this.lightPlanStorage.storeLightPlanToFile(this.lightPlanStorage.getLightPlanFile());
 	}
 
-	public void setLightPlan(DimmingPlan lightPlan) {
+	void setLightPlan(DimmingPlan lightPlan) {
 		this.lightPlan = lightPlan;
 	}
 
@@ -76,11 +77,11 @@ public class LightServerController implements LightTaskDaemon {
 		return lightPlan;
 	}
 
-	public void setTimer(LightTimer timer) {
+	void setTimer(LightTimer timer) {
 		this.timer = timer;
 	}
 
-	public void setServer(RESTServer server) {
+	void setServer(RESTServer server) {
 		this.server = server;
 	}
 
@@ -114,10 +115,6 @@ public class LightServerController implements LightTaskDaemon {
 
 	public void clearForcedValue(String channelId) {
 		this.lightPlan.channel(channelId).unpin();
-	}
-
-	public File getLightPlanFile() {
-		return this.lightPlanStorage.getLightPlanFile();
 	}
 
 	public JSONPlan getJsonLightPlan() {

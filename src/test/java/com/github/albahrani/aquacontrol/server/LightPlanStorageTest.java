@@ -99,12 +99,9 @@ public class LightPlanStorageTest {
 		plan.setChannels(channels);
 
 		LightPlanStorage controller = new LightPlanStorage();
-		try {
-			controller.write(plan, writer);
-		} catch (IOException e) {
-			fail("Unexcepted IOException while storing plan.");
-		}
-
+		boolean success = controller.write(plan, writer);
+		assertTrue(success);
+		
 		String planStr = writer.toString();
 
 		String rn = System.getProperty("line.separator");
