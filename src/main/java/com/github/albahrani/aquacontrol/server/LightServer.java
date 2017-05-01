@@ -16,7 +16,9 @@
 package com.github.albahrani.aquacontrol.server;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -103,14 +105,25 @@ public class LightServer {
 	}
 
 	public static Optional<JSONPlan> readLightPlanFile(Optional<File> lightPlanFile) {
-		Optional<JSONPlan> restPlan = Optional.empty();
-		if (lightPlanFile.isPresent()) {
-			ObjectMapper mapper = new ObjectMapper();
-			try {
-				restPlan = Optional.of(mapper.readValue(lightPlanFile.get(), JSONPlan.class));
+		
+		return lightPlanFile.flatMap(file -> {
+			Optional<JSONPlan> jsonPlan = Optional.empty();	
+			try(FileInputStream fis = new FileInputStream(file)){
+				jsonPlan = LightServer.readLightPlanInputStream(fis);
 			} catch (IOException e) {
-				Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
+				Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);	
 			}
+			return jsonPlan;
+		});
+	}
+	
+	public static Optional<JSONPlan> readLightPlanInputStream(InputStream lightPlanFile) {
+		Optional<JSONPlan> restPlan = Optional.empty();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			restPlan = Optional.of(mapper.readValue(lightPlanFile, JSONPlan.class));
+		} catch (IOException e) {
+			Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
 		}
 		return restPlan;
 	}
@@ -176,7 +189,7 @@ public class LightServer {
 			if (processor.startsWith("ARM")) {
 				runningOnRaspberry = true;
 			}
-		} catch (@SuppressWarnings("unused") Exception e) {
+		} catch (Exception e) {
 			// ignore, but we are sure we have no pi here
 		}
 		return runningOnRaspberry;

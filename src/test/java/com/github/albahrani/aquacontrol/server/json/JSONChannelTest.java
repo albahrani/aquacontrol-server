@@ -53,7 +53,7 @@ public class JSONChannelTest {
 			String jsonString = mapper.writeValueAsString(json);
 			assertNotNull(jsonString);
 			assertEquals("{\"id\":\"2\",\"timetable\":[{\"time\":[6,30],\"perc\":12.0},{\"time\":[12,0],\"perc\":56.0}]}", jsonString);
-		} catch (@SuppressWarnings("unused") JsonProcessingException e) {
+		} catch (JsonProcessingException e) {
 			fail("Error while converting JSONChannel to String.");
 		}
 	}

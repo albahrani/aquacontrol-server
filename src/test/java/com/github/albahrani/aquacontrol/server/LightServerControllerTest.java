@@ -35,6 +35,7 @@ import org.junit.Test;
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
 import com.github.albahrani.aquacontrol.core.LightTask;
 import com.github.albahrani.aquacontrol.core.LightTimer;
+import com.github.albahrani.aquacontrol.server.json.JSONPlan;
 import com.github.albahrani.aquacontrol.server.rest.RESTServer;
 import com.github.albahrani.dimmingplan.DimmingPlan;
 import com.github.albahrani.dimmingplan.DimmingPlanChannel;
@@ -175,6 +176,21 @@ public class LightServerControllerTest {
 	}
 
 	@Test
+	public void testPause() {
+		LightTimer timer = mock(LightTimer.class);
+		RESTServer server = mock(RESTServer.class);
+
+		LightServerController daemon = new LightServerController();
+		daemon.setServer(server);
+		daemon.setTimer(timer);
+		daemon.pause();
+
+		verifyZeroInteractions(server);
+		verify(timer).stop();
+		verifyNoMoreInteractions(timer);
+	}
+	
+	@Test
 	public void testResume() {
 		LightTimer timer = mock(LightTimer.class);
 		RESTServer server = mock(RESTServer.class);
@@ -187,5 +203,23 @@ public class LightServerControllerTest {
 		verifyZeroInteractions(server);
 		verify(timer).start(daemon);
 		verifyNoMoreInteractions(timer);
+	}
+	
+	@Test
+	public void testUpdateLightPlan() {
+		
+		LightPlanStorage lightPlanStorage = mock(LightPlanStorage.class);
+		File file = new File("test");
+		when(lightPlanStorage.getLightPlanFile()).thenReturn(file);
+		JSONPlan jsonPlan = mock(JSONPlan.class);
+		
+		LightServerController daemon = new LightServerController();
+		daemon.setLightPlanStorage(lightPlanStorage);
+		daemon.updateLightPlan(jsonPlan);
+		
+		verify(lightPlanStorage).setJsonLightPlan(jsonPlan);
+		verify(lightPlanStorage).getLightPlanFile();
+		verify(lightPlanStorage).storeLightPlanToFile(file);
+		verifyNoMoreInteractions(lightPlanStorage);
 	}
 }

@@ -42,7 +42,7 @@ public class LightTaskTest {
 			LightTask lightTask = new LightTask();
 			lightTask.executePlanFor(LocalTime.of(0, 0));
 			fail("Should throw an exception.");
-		} catch (@SuppressWarnings("unused") Throwable t) {
+		} catch (Throwable t) {
 			// the exception is wanted here
 		}
 	}

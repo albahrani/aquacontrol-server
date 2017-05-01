@@ -16,8 +16,10 @@
 package com.github.albahrani.aquacontrol.server;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.util.Objects;
 
@@ -39,12 +41,16 @@ public class LightPlanStorage {
 		return this.lightPlanFile;
 	}
 
+	public JSONPlan read(InputStream lightPlanInputStream) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.readValue(lightPlanInputStream, JSONPlan.class);
+	}
+
 	public DimmingPlan loadLightPlanFromFile(File lightPlanFile) {
 		this.lightPlanFile = lightPlanFile;
 
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			this.jsonLightPlan = mapper.readValue(lightPlanFile, JSONPlan.class);
+		try (FileInputStream fis = new FileInputStream(lightPlanFile)) {
+			this.jsonLightPlan = this.read(fis);
 		} catch (IOException e) {
 			Logger.error(e, "Could not load plan from {}. Either not available or invalid format.", lightPlanFile);
 			this.jsonLightPlan = new JSONPlan();
@@ -68,24 +74,18 @@ public class LightPlanStorage {
 		this.lightPlanFile = lightPlanPath;
 		boolean success = false;
 		try (FileWriter writer = new FileWriter(this.lightPlanFile)) {
-			success = this.write(this.jsonLightPlan, writer);
+			this.write(this.jsonLightPlan, writer);
+			success = true;
 		} catch (IOException e) {
 			Logger.error(e, "Error storing plan to file {}.", this.lightPlanFile);
 		}
 		return success;
 	}
 
-	public boolean write(JSONPlan restPlan, Writer writer) {
-		boolean success = false;
+	public void write(JSONPlan restPlan, Writer writer) throws IOException {
 		ObjectMapper jacksonMapper = new ObjectMapper();
 		ObjectWriter jacksonWriter = jacksonMapper.writer(new DefaultPrettyPrinter());
-		try {
-			jacksonWriter.writeValue(writer, restPlan);
-			success = true;
-		} catch (IOException e) {
-			Logger.error(e, "Error writing plan to writer.");
-		}
-		return success;
+		jacksonWriter.writeValue(writer, restPlan);
 	}
 
 	public void setJsonLightPlan(JSONPlan jsonLightPlan) {

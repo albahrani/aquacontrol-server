@@ -29,9 +29,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
@@ -88,7 +92,7 @@ public class LightServerTest {
 		try {
 			LightServer.createEnvironmentFromConfiguration(null, connector);
 			fail("Expected NullPointerException");
-		} catch (@SuppressWarnings("unused") NullPointerException e) {
+		} catch (NullPointerException e) {
 			// ignore
 		}
 	}
@@ -145,4 +149,56 @@ public class LightServerTest {
 		inOrder.verify(connector).setPwmValue(anySet(), eq(0));
 	}
 
+	@Test
+	public void testReadLightPlanInputStream() {
+		String rn = System.getProperty("line.separator");
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append(rn);
+		sb.append("  \"channels\" : [ {");
+		sb.append(rn);
+		sb.append("    \"id\" : \"0x20\",");
+		sb.append(rn);
+		sb.append("    \"timetable\" : [ {");
+		sb.append(rn);
+		sb.append("      \"time\" : [ 6, 0 ],");
+		sb.append(rn);
+		sb.append("      \"perc\" : 0.0");
+		sb.append(rn);
+		sb.append("    }, {");
+		sb.append(rn);
+		sb.append("      \"time\" : [ 8, 0 ],");
+		sb.append(rn);
+		sb.append("      \"perc\" : 100.0");
+		sb.append(rn);
+		sb.append("    } ]");
+		sb.append(rn);
+		sb.append("  } ]");
+		sb.append(rn);
+		sb.append("}");
+		String testString = sb.toString();
+
+		InputStream stream = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
+		Optional<JSONPlan> optionalJsonPlan = LightServer.readLightPlanInputStream(stream);
+		
+		assertNotNull(optionalJsonPlan);
+		assertTrue(optionalJsonPlan.isPresent());
+		JSONPlan jsonPlan = optionalJsonPlan.get();
+		assertNotNull(jsonPlan);
+		List<JSONChannel> channels = jsonPlan.getChannels();
+		assertNotNull(channels);
+		assertEquals(1, channels.size());
+		JSONChannel channel = channels.get(0);
+		assertNotNull(channel);
+		assertEquals("0x20", channel.getId());
+		List<JSONTimeValuePair> timetable = channel.getTimetable();
+		assertNotNull(timetable);
+		assertEquals(2, timetable.size());
+		JSONTimeValuePair tte1 = timetable.get(0);
+		assertEquals(LocalTime.of(6, 0), tte1.getTime());
+		assertEquals(0.0d, tte1.getPerc(), 0.001d);
+		JSONTimeValuePair tte2 = timetable.get(1);
+		assertEquals(LocalTime.of(8, 0), tte2.getTime());
+		assertEquals(100.0d, tte2.getPerc(), 0.001d);
+	}
 }
