@@ -25,6 +25,7 @@ import com.github.albahrani.aquacontrol.core.environment.PWMControllerConnector;
 import com.pi4j.gpio.extension.pca.PCA9685GpioProvider;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPin;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
@@ -117,5 +118,13 @@ public class PCA9685Connector implements PWMControllerConnector {
 	@Override
 	public void provisionPwmOutputPin(Pin pin) {
 		gpio.provisionPwmOutputPin(pca9685, pin);
+	}
+	
+	@Override
+	public void unprovisionPwmOutputPin(Pin pin) {
+		GpioPin provisionedPin = gpio.getProvisionedPin(pin);
+		if(provisionedPin != null) {
+			gpio.unprovisionPin(provisionedPin);
+		}
 	}
 }

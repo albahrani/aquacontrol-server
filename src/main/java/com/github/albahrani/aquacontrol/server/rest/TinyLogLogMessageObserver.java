@@ -24,6 +24,8 @@ import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.pipeline.MessageObserver;
 
+import io.netty.handler.codec.http.HttpMethod;
+
 public class TinyLogLogMessageObserver extends MessageObserver {
 	private Map<String, Long> timers = new ConcurrentHashMap<>();
 
@@ -33,24 +35,31 @@ public class TinyLogLogMessageObserver extends MessageObserver {
 	protected void onReceived(Request request, Response response) {
 		timers.put(request.getCorrelationId(), System.currentTimeMillis());
 		successReceived.put(request.getCorrelationId(), false);
-		Logger.info("{} {} {} received.", request.getCorrelationId(), request.getEffectiveHttpMethod(),
+		
+		if(! HttpMethod.GET.equals(request.getEffectiveHttpMethod())){
+			Logger.info("{} {} {} received.", request.getCorrelationId(), request.getEffectiveHttpMethod(),
 				request.getUrl());
+		}
 	}
 
 	@Override
 	protected void onException(Throwable exception, Request request, Response response) {
 		Boolean success = successReceived.get(request.getCorrelationId());
 		if (!Boolean.TRUE.equals(success)) {
+			if(! HttpMethod.GET.equals(request.getEffectiveHttpMethod())){
 			Logger.info("{} {} {} threw exception: {}", request.getCorrelationId(), request.getEffectiveHttpMethod(),
 					request.getUrl(), exception.getMessage());
+			}
 		}
 	}
 
 	@Override
 	protected void onSuccess(Request request, Response response) {
 		successReceived.put(request.getCorrelationId(), true);
+		if(! HttpMethod.GET.equals(request.getEffectiveHttpMethod())){
 		Logger.info("{} {} {} was successfull.", request.getCorrelationId(), request.getEffectiveHttpMethod(),
 				request.getUrl());
+		}
 	}
 
 	@Override
@@ -62,7 +71,9 @@ public class TinyLogLogMessageObserver extends MessageObserver {
 			duration = Optional.of(String.valueOf(System.currentTimeMillis() - startTime) + "ms");
 		}
 
+		if(! HttpMethod.GET.equals(request.getEffectiveHttpMethod())){
 		Logger.info("{} {} {} responded with {} in {}", request.getCorrelationId(), request.getEffectiveHttpMethod(),
 				request.getUrl(), response.getResponseStatus(), duration.orElse("(no timer found)"));
+		}
 	}
 }

@@ -27,4 +27,6 @@ public interface PWMControllerConnector {
 
 	public abstract void provisionPwmOutputPin(Pin pin);
 
+	public abstract void unprovisionPwmOutputPin(Pin pin);
+
 }

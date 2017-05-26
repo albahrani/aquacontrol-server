@@ -89,6 +89,11 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 	public void provisionPwmOutputPin(Pin pin) {
 		SwingUtilities.invokeLater(() -> model.setValue(pin, null));
 	}
+	
+	@Override
+	public void unprovisionPwmOutputPin(Pin pin) {
+		SwingUtilities.invokeLater(() -> model.removeRow(pin));
+	}
 
     private static JFrame createLightFrame(LightFrameModel model){
         JFrame frame = new JFrame();
@@ -126,6 +131,18 @@ public class PWMControllerConnectorDummy implements PWMControllerConnector {
 				fireTableRowsInserted(rowIndex, rowIndex);
 			} else {
 				fireTableRowsUpdated(rowIndex, rowIndex);
+			}
+		}
+		
+		public void removeRow(Pin pin) {
+			int rowIndex = this.channels.indexOf(pin);
+
+			this.pwmDuration.remove(pin);
+			this.pwmPercentage.remove(pin);
+
+			if (rowIndex >= 0) {
+				this.channels.remove(pin);
+				fireTableRowsDeleted(rowIndex, rowIndex);
 			}
 		}
 

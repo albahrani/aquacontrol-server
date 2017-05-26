@@ -16,11 +16,15 @@
 package com.github.albahrani.aquacontrol.core;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.albahrani.aquacontrol.core.environment.PWMControllerConnector;
+import com.pi4j.gpio.extension.pca.PCA9685Pin;
+import com.pi4j.io.gpio.Pin;
 
 public class LightEnvironment {
 
@@ -41,9 +45,29 @@ public class LightEnvironment {
 	}
 
 	public void addChannel(String channelId, LightEnvironmentChannel channel) {
+		if(this.channels.containsKey(channelId)){
+			return;
+		}
 		this.channels.put(channelId, channel);
 	}
+	
+	public void updateChannel(String channelId, LightEnvironmentChannel channel) {
+		if(!this.channels.containsKey(channelId)){
+			return;
+		}
+		List<Pin> newPins = channel.pins().collect(Collectors.toList());
+		LightEnvironmentChannel oldChannel = this.channels.put(channelId, channel);		
+		oldChannel.pins().filter(pold -> {
+			return !newPins.contains(pold);
+		}).forEach(pold -> {
+			this.pwmControllerConnector.unprovisionPwmOutputPin(pold);
+		});;
+	}
 
+	public void removeChannel(String channelId) {
+		this.channels.remove(channelId);
+	}
+	
 	public static LightEnvironmentBuilder create(PWMControllerConnector pwmControllerConnector) {
 		Objects.requireNonNull(pwmControllerConnector);
 		return new LightEnvironmentBuilder(pwmControllerConnector);

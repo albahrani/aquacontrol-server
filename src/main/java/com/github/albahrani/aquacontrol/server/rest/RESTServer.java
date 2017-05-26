@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.HttpMethod;
 
 public class RESTServer {
 
+	private static final String PREFLIGHT_METHOD_NAME = "preflight";
 	private RestExpress server;
 	private LightServerController daemon;
 
@@ -40,15 +41,17 @@ public class RESTServer {
 		this.server.uri("/plan", new PlanController(this.daemon))
 				.action("upload", HttpMethod.POST)
 				.action("get", HttpMethod.GET)
-				.action("preflight", HttpMethod.OPTIONS);
+				.action(PREFLIGHT_METHOD_NAME, HttpMethod.OPTIONS);
 
 		ChannelController channelController = new ChannelController(this.daemon);
 		this.server.uri("/channels", channelController)
 				.action("getChannels", HttpMethod.GET)
-				.action("preflight", HttpMethod.OPTIONS);
+				.action(PREFLIGHT_METHOD_NAME, HttpMethod.OPTIONS);
 		this.server.uri("/channels/{channelId}", channelController)
 				.action("addChannel", HttpMethod.PUT)
-				.action("preflight", HttpMethod.OPTIONS);
+				.action("updateChannel", HttpMethod.POST)
+				.action("deleteChannel", HttpMethod.DELETE)
+				.action(PREFLIGHT_METHOD_NAME, HttpMethod.OPTIONS);
 
 		ServerLifecycleController lifecycleController = new ServerLifecycleController(this.daemon);
 		this.server.uri("/shutdown", lifecycleController)

@@ -59,12 +59,36 @@ public class ChannelController {
 			response.setBody(channelIdsToName);
 			response.setResponseStatus(HttpResponseStatus.OK);
 		} catch (Exception e) {
-			Logger.error(e, "Unexpected error.");
+			Logger.error(e, "Unexpected error while getChannels.");
 			response.setException(e);
 		}
 	}
 
 	public void addChannel(Request request, Response response) {
+		if (!CORSHelper.handleCORS(request, response)) {
+			return;
+		}
+
+		try {
+			String channelId = request.getHeader("channelId", "Channel Id is missing.");
+			JSONConfigurationChannel channelDef = request.getBodyAs(JSONConfigurationChannel.class);
+			System.out.println(channelDef.getPins());
+			LightEnvironment lightEnvironment = this.daemon.getLightEnvironment();
+			LightEnvironmentChannelBuilder channelBuilder = LightEnvironmentChannel
+					.create(channelId, lightEnvironment.getPwmControllerConnector())
+					.withName(channelDef.getName())
+					.withColor(channelDef.getColor());
+			channelDef.getPins().forEach(channelBuilder::usePin);
+			lightEnvironment.addChannel(channelId, channelBuilder.build());
+
+			response.setResponseStatus(HttpResponseStatus.OK);
+		} catch (Exception e) {
+			Logger.error(e, "Unexpected error while adding channel.");
+			response.setException(e);
+		}
+	}
+	
+	public void updateChannel(Request request, Response response) {
 		if (!CORSHelper.handleCORS(request, response)) {
 			return;
 		}
@@ -79,11 +103,29 @@ public class ChannelController {
 					.withName(channelDef.getName())
 					.withColor(channelDef.getColor());
 			channelDef.getPins().forEach(channelBuilder::usePin);
-			lightEnvironment.addChannel(channelId, channelBuilder.build());
+			lightEnvironment.updateChannel(channelId, channelBuilder.build());
 
 			response.setResponseStatus(HttpResponseStatus.OK);
 		} catch (Exception e) {
-			Logger.error(e, "Unexpected error.");
+			Logger.error(e, "Unexpected error while updating channel.");
+			response.setException(e);
+		}
+	}
+	
+	public void deleteChannel(Request request, Response response) {
+		if (!CORSHelper.handleCORS(request, response)) {
+			return;
+		}
+
+		try {
+			String channelId = request.getHeader("channelId", "Channel Id is missing.");
+
+			LightEnvironment lightEnvironment = this.daemon.getLightEnvironment();
+			lightEnvironment.removeChannel(channelId);
+
+			response.setResponseStatus(HttpResponseStatus.OK);
+		} catch (Exception e) {
+			Logger.error(e, "Unexpected error while deleting channel.");
 			response.setException(e);
 		}
 	}
