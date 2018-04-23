@@ -18,17 +18,14 @@ package com.github.albahrani.aquacontrol.server.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.mockito.internal.stubbing.answers.ThrowsException;
 
 import com.github.albahrani.aquacontrol.core.environment.LightEnvironmentChannelConfiguration;
 import com.github.albahrani.aquacontrol.core.environment.LightEnvironmentConfiguration;
@@ -52,23 +49,8 @@ public class LightServerConfigurationFactoryTest {
 
 	@Test
 	public void testLoadConfigWithReaderException() {
-		Reader reader = mock(Reader.class, new ThrowsException(new IOException("Test exception")));
 		try {
-			LightServerConfigurationFactory.loadConfiguration(reader);
-			fail("Should throw an InvalidConfigurationException.");
-		} catch (InvalidConfigurationException e) {
-			// should reach here
-			assertNotNull(e);
-		} catch (Throwable e) {
-			fail("Should throw an InvalidConfigurationException. Has thrown " + e.getClass().getName() + " instead.");
-		}
-	}
-
-	@Test
-	public void testLoadConfigWithReaderExceptionWithMessage() {
-		Reader reader = mock(Reader.class, new ThrowsException(new IOException("Test exception")));
-		try {
-			LightServerConfigurationFactory.loadConfiguration(reader);
+			LightServerConfigurationFactory.loadConfiguration((Reader) null);
 			fail("Should throw an InvalidConfigurationException.");
 		} catch (InvalidConfigurationException e) {
 			// should reach here
