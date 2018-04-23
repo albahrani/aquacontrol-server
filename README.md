@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/albahrani/aquacontrol-server.svg?branch=master)](https://travis-ci.org/albahrani/aquacontrol-server)
-[![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.github.albahrani.aquacontrol:aquacontrol-server)](https://sonarqube.com/dashboard/index/com.github.albahrani.aquacontrol:aquacontrol-server)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.albahrani.aquacontrol/aquacontrol-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.albahrani.aquacontrol/aquacontrol-server)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.github.albahrani.aquacontrol%3Aaquacontrol-server&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.albahrani.aquacontrol%3Aaquacontrol-server)
 ===============
 aquacontrol-server
 ===============
