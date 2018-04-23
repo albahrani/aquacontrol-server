@@ -98,7 +98,31 @@
 			<groupId>com.github.albahrani</groupId>
 			<artifactId>pi4j-rest-sysinfo</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>						
+		</dependency>	
+		<dependency>
+			<!-- 
+                           Force use of jackson-databind@2.8.11.1 because of vulnerablilities:
+                           - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-7489
+                           - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-7525
+                           caused by RestExpress@0.11.3
+                           Remove when update is available.
+                        -->
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.8.11.1</version>
+		</dependency>
+		<dependency>
+			<!-- 
+                           Force use of xstream@1.4.10 because of vulnerablilities:
+                           - CVE-2017-7957. See http://x-stream.github.io/changes.html
+                           - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3674
+                           caused by RestExpress@0.11.3
+                           Remove when update is available.
+                        -->
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.10</version>
+</dependency>		
 	</dependencies>
 
 	<build>
