@@ -1,8 +1,8 @@
 [![Build Status](https://travis-ci.org/albahrani/aquacontrol-server.svg?branch=master)](https://travis-ci.org/albahrani/aquacontrol-server)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.github.albahrani.aquacontrol%3Aaquacontrol-server&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.albahrani.aquacontrol%3Aaquacontrol-server)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e2c4ba7ebd164900abb1debfb1fb1a78)](https://app.codacy.com/app/albahrani/aquacontrol-server?utm_source=github.com&utm_medium=referral&utm_content=albahrani/aquacontrol-server&utm_campaign=badger) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server?ref=badge_shield)
-               
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e2c4ba7ebd164900abb1debfb1fb1a78)](https://app.codacy.com/app/albahrani/aquacontrol-server?utm_source=github.com&utm_medium=referral&utm_content=albahrani/aquacontrol-server&utm_campaign=badger)
 [![Known Vulnerabilities](https://snyk.io/test/github/albahrani/aquacontrol-server/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/albahrani/aquacontrol-server?targetFile=pom.xml)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server?ref=badge_shield)
 ===============
 aquacontrol-server
 ===============
