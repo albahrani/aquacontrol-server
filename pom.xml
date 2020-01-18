@@ -92,37 +92,13 @@
 		<dependency>
 			<groupId>com.github.albahrani</groupId>
 			<artifactId>dimmingplan</artifactId>
-			<version>0.0.3</version>
+			<version>master-SNAPSHOT</version>
 		</dependency>	
 		<dependency>
 			<groupId>com.github.albahrani</groupId>
 			<artifactId>pi4j-rest-sysinfo</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>master-SNAPSHOT</version>
 		</dependency>	
-		<dependency>
-			<!-- 
-                           Force use of jackson-databind@2.8.11.1 because of vulnerablilities:
-                           - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-7489
-                           - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-7525
-                           caused by RestExpress@0.11.3
-                           Remove when update is available.
-                        -->
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.10.0.pr1</version>
-		</dependency>
-		<dependency>
-			<!-- 
-                           Force use of xstream@1.4.10 because of vulnerablilities:
-                           - CVE-2017-7957. See http://x-stream.github.io/changes.html
-                           - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3674
-                           caused by RestExpress@0.11.3
-                           Remove when update is available.
-                        -->
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.4.11.1</version>
-                </dependency>		
 	</dependencies>
 
 	<build>
@@ -189,52 +165,6 @@
 								<id>attach-javadocs</id>
 								<goals>
 									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>deployToOssrh</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<distributionManagement>
-				<snapshotRepository>
-					<id>ossrh</id>
-					<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-				</snapshotRepository>
-				<repository>
-					<id>ossrh</id>
-					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-				</repository>
-			</distributionManagement>
-			<build>
-				<plugins>
-					<!-- Plugin for deployment to OSS Sonatype -->
-					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
 								</goals>
 							</execution>
 						</executions>
