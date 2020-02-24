@@ -24,19 +24,26 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.Timer;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class LightTimerTest {
 
-	@Test
-	public void testStart() {
-		Timer timer = mock(Timer.class);
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
 
-		LightTimer lightTimer = new LightTimer();
-		lightTimer.setTimer(timer);
+    @Test
+    public void testStart() {
+        Timer timer = mock(Timer.class);
+        LightTaskDaemon daemon = mock(LightTaskDaemon.class);
 
-		lightTimer.start(daemon);
+        LightTimer lightTimer = new LightTimer();
+        lightTimer.setTimer(timer);
+
+        lightTimer.start(daemon);
 
 		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(1000l));
 		verifyNoMoreInteractions(timer);

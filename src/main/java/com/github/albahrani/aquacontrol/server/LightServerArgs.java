@@ -18,10 +18,10 @@ package com.github.albahrani.aquacontrol.server;
 import java.io.File;
 import java.util.Optional;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.pmw.tinylog.Logger;
 
 public class LightServerArgs {
 

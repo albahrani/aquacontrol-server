@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.albahrani.aquacontrol.server.json.JSONChannel;
@@ -42,15 +44,20 @@ import com.github.albahrani.dimmingplan.DimmingPlanChannel;
 
 public class LightPlanStorageTest {
 
-	@Test
-	public void testFromJson() {
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
 
-		JSONPlan jsonPlan = new JSONPlan();
-		List<JSONChannel> jsonChannels = new ArrayList<>();
-		JSONChannel jsonChannel = new JSONChannel();
-		jsonChannel.setId("0x20");
+    @Test
+    public void testFromJson() {
 
-		List<JSONTimeValuePair> jsonTimetable = new ArrayList<>();
+        JSONPlan jsonPlan = new JSONPlan();
+        List<JSONChannel> jsonChannels = new ArrayList<>();
+        JSONChannel jsonChannel = new JSONChannel();
+        jsonChannel.setId("0x20");
+
+        List<JSONTimeValuePair> jsonTimetable = new ArrayList<>();
 		JSONTimeValuePair p1 = new JSONTimeValuePair();
 		p1.setTime(LocalTime.of(6, 0));
 		p1.setPerc(0.0d);

@@ -21,6 +21,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restexpress.Request;
 import org.restexpress.Response;
@@ -31,14 +33,19 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class ServerLifecycleControllerTest {
 
-	@Test
-	public void testPause() {
-		LightServerController daemon = mock(LightServerController.class);
-		ServerLifecycleController controller = new ServerLifecycleController(daemon);
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
 
-		Request request = mock(Request.class);
-		Response response = mock(Response.class);
-		controller.pause(request, response);
+    @Test
+    public void testPause() {
+        LightServerController daemon = mock(LightServerController.class);
+        ServerLifecycleController controller = new ServerLifecycleController(daemon);
+
+        Request request = mock(Request.class);
+        Response response = mock(Response.class);
+        controller.pause(request, response);
 
 		verify(daemon).pause();
 		verifyNoMoreInteractions(daemon);

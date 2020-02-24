@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.pmw.tinylog.Logger;
+import com.github.albahrani.aquacontrol.logger.Logger;
 import org.restexpress.Request;
 import org.restexpress.Response;
 

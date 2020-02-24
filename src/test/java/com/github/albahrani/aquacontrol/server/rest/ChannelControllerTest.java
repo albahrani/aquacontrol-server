@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.restexpress.Request;
@@ -45,15 +47,20 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class ChannelControllerTest {
 
-	@Test
-	public void testGetChannels() {
-		LightServerController daemon = mock(LightServerController.class);
-		LightEnvironment lightEnv = mock(LightEnvironment.class);
-		LightEnvironmentChannel channel1 = mock(LightEnvironmentChannel.class);
-		when(channel1.id()).thenReturn("Channel1");
-		when(channel1.name()).thenReturn("White");
-		when(channel1.lastValue()).thenReturn(50.0d);
-		when(channel1.pins()).thenReturn(Stream.of(PCA9685Pin.PWM_00));
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
+
+    @Test
+    public void testGetChannels() {
+        LightServerController daemon = mock(LightServerController.class);
+        LightEnvironment lightEnv = mock(LightEnvironment.class);
+        LightEnvironmentChannel channel1 = mock(LightEnvironmentChannel.class);
+        when(channel1.id()).thenReturn("Channel1");
+        when(channel1.name()).thenReturn("White");
+        when(channel1.lastValue()).thenReturn(50.0d);
+        when(channel1.pins()).thenReturn(Stream.of(PCA9685Pin.PWM_00));
 		LightEnvironmentChannel channel2 = mock(LightEnvironmentChannel.class);
 		when(channel2.id()).thenReturn("Channel2");
 		when(channel2.name()).thenReturn("Red");

@@ -22,6 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restexpress.Request;
 import org.restexpress.Response;
@@ -34,15 +36,20 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class ForcedValuesControllerTest {
 
-	@Test
-	public void testForceValue() {
-		LightServerController daemon = mock(LightServerController.class);
-		ForcedValuesController controller = new ForcedValuesController(daemon);
-		
-		Request request = mock(Request.class);
-		when(request.getHeader(eq("channelId"), anyString())).thenReturn("warmwhite");
-		JSONForceValue jsonForceValue = new JSONForceValue();
-		jsonForceValue.setValue(75.0d);
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
+
+    @Test
+    public void testForceValue() {
+        LightServerController daemon = mock(LightServerController.class);
+        ForcedValuesController controller = new ForcedValuesController(daemon);
+
+        Request request = mock(Request.class);
+        when(request.getHeader(eq("channelId"), anyString())).thenReturn("warmwhite");
+        JSONForceValue jsonForceValue = new JSONForceValue();
+        jsonForceValue.setValue(75.0d);
 		when(request.getBodyAs(JSONForceValue.class)).thenReturn(jsonForceValue);
 		
 		Response response = mock(Response.class);

@@ -19,8 +19,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.TimerTask;
 
-import org.pmw.tinylog.Logger;
-
+import com.github.albahrani.aquacontrol.logger.Logger;
 import com.github.albahrani.dimmingplan.DimmingPlan;
 
 public class LightTask extends TimerTask {

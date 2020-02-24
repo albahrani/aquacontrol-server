@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -43,15 +45,20 @@ import com.pi4j.io.gpio.Pin;
 
 public class LightServerTest {
 
-	@Test
-	public void testStartLightServer(){
-		PWMControllerConnector pwmControllerConnector = mock(PWMControllerConnector.class);
-		Optional<LightServerController> optionalServer = LightServer.initLightServer(new String[]{}, pwmControllerConnector);
-		assertNotNull(optionalServer);
-		assertTrue(optionalServer.isPresent());
-		LightServerController server = optionalServer.get();
-		server.start();
-		server.shutdown();
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
+
+    @Test
+    public void testStartLightServer() {
+        PWMControllerConnector pwmControllerConnector = mock(PWMControllerConnector.class);
+        Optional<LightServerController> optionalServer = LightServer.initLightServer(new String[]{}, pwmControllerConnector);
+        assertNotNull(optionalServer);
+        assertTrue(optionalServer.isPresent());
+        LightServerController server = optionalServer.get();
+        server.start();
+        server.shutdown();
 		
 		verify(pwmControllerConnector).shutdown();
 		verifyNoMoreInteractions(pwmControllerConnector);

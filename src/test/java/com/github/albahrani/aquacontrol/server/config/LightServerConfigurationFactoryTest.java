@@ -25,6 +25,8 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.albahrani.aquacontrol.core.environment.LightEnvironmentChannelConfiguration;
@@ -32,15 +34,20 @@ import com.github.albahrani.aquacontrol.core.environment.LightEnvironmentConfigu
 
 public class LightServerConfigurationFactoryTest {
 
-	@Test
-	public void testLoadConfigWithInvalidFile() {
-		File file = new File("§$%&/invalid;:");
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
 
-		try {
-			LightServerConfigurationFactory.loadConfiguration(Optional.of(file));
-			fail("Should throw an InvalidConfigurationException.");
-		} catch (InvalidConfigurationException e) {
-			// should reach here
+    @Test
+    public void testLoadConfigWithInvalidFile() {
+        File file = new File("§$%&/invalid;:");
+
+        try {
+            LightServerConfigurationFactory.loadConfiguration(Optional.of(file));
+            fail("Should throw an InvalidConfigurationException.");
+        } catch (InvalidConfigurationException e) {
+            // should reach here
 			assertNotNull(e);
 		} catch (Throwable e) {
 			fail("Should throw an InvalidConfigurationException. Has thrown " + e.getClass().getName() + " instead.");

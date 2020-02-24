@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restexpress.Request;
 import org.restexpress.Response;
@@ -38,15 +40,21 @@ import com.github.albahrani.aquacontrol.server.json.JSONChannelState;
 import com.github.albahrani.aquacontrol.server.json.JSONStatusReport;
 
 public class StatusReportControllerTest {
-	@Test
-	public void testUptime0ms() {
-		String uptime = StatusReportController.formatUptime(0);
-		assertEquals("0 min 0 sec", uptime);
-	}
 
-	@Test
-	public void testUptime500ms() {
-		String uptime = StatusReportController.formatUptime(500);
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
+
+    @Test
+    public void testUptime0ms() {
+        String uptime = StatusReportController.formatUptime(0);
+        assertEquals("0 min 0 sec", uptime);
+    }
+
+    @Test
+    public void testUptime500ms() {
+        String uptime = StatusReportController.formatUptime(500);
 		assertEquals("0 min 0 sec", uptime);
 	}
 

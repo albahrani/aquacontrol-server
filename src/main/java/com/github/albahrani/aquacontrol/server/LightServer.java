@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.pmw.tinylog.Logger;
-
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
 import com.github.albahrani.aquacontrol.core.LightEnvironmentBuilder;
 import com.github.albahrani.aquacontrol.core.LightEnvironmentChannel;
@@ -30,6 +28,7 @@ import com.github.albahrani.aquacontrol.core.environment.LightEnvironmentConfigu
 import com.github.albahrani.aquacontrol.core.environment.PWMControllerConnector;
 import com.github.albahrani.aquacontrol.core.environment.dummy.PWMControllerConnectorDummy;
 import com.github.albahrani.aquacontrol.core.environment.production.PCA9685Connector;
+import com.github.albahrani.aquacontrol.logger.Logger;
 import com.github.albahrani.aquacontrol.server.config.InvalidConfigurationException;
 import com.github.albahrani.aquacontrol.server.config.LightServerConfigurationFactory;
 import com.pi4j.system.SystemInfo;

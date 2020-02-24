@@ -69,20 +69,20 @@ public class RESTServer {
 				.action("clearForcedValue", HttpMethod.DELETE)
 				.action("clearForcedValue", HttpMethod.OPTIONS);
 
-		StatusReportController statusReportController = new StatusReportController(daemon);
-		this.server.uri("/status", statusReportController)
-				.action("getStatus", HttpMethod.GET)
-				.action("getStatus", HttpMethod.OPTIONS);
+        StatusReportController statusReportController = new StatusReportController(daemon);
+        this.server.uri("/status", statusReportController)
+                .action("getStatus", HttpMethod.GET)
+                .action("getStatus", HttpMethod.OPTIONS);
 
-		if (LightServer.isRunningOnRaspberry()) {
-			RaspberrySystemInfoController raspberrySystemInfoController = new RaspberrySystemInfoController();
-			raspberrySystemInfoController.attach(this.server, "/raspberry/systeminfo");
-		}
+        if (LightServer.isRunningOnRaspberry()) {
+            RaspberrySystemInfoController raspberrySystemInfoController = new RaspberrySystemInfoController();
+            raspberrySystemInfoController.attach(this.server, "/raspberry/systeminfo");
+        }
 
-		this.server.addMessageObserver(new TinyLogLogMessageObserver());
+        this.server.addMessageObserver(new LogMessageObserver());
 
-		this.server.bind();
-	}
+        this.server.bind();
+    }
 
 	public void shutdown() {
 		this.server.shutdown();

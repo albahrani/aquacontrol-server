@@ -23,6 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restexpress.Request;
 import org.restexpress.Response;
@@ -34,15 +36,20 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class PlanControllerTest {
 
-	@Test
-	public void testUpload() {
-		LightServerController daemon = mock(LightServerController.class);
-		PlanController controller = new PlanController(daemon);
-		Request request = mock(Request.class);
-		JSONPlan jsonPlan = new JSONPlan();
-		when(request.getBodyAs(JSONPlan.class)).thenReturn(jsonPlan);
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
 
-		Response response = mock(Response.class);
+    @Test
+    public void testUpload() {
+        LightServerController daemon = mock(LightServerController.class);
+        PlanController controller = new PlanController(daemon);
+        Request request = mock(Request.class);
+        JSONPlan jsonPlan = new JSONPlan();
+        when(request.getBodyAs(JSONPlan.class)).thenReturn(jsonPlan);
+
+        Response response = mock(Response.class);
 		controller.upload(request, response);
 
 		verify(daemon).updateLightPlan(jsonPlan);

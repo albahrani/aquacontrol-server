@@ -15,7 +15,7 @@
  */
 package com.github.albahrani.aquacontrol.server.rest;
 
-import org.pmw.tinylog.Logger;
+import com.github.albahrani.aquacontrol.logger.Logger;
 import org.restexpress.Request;
 import org.restexpress.Response;
 

@@ -24,11 +24,10 @@ import java.io.Writer;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.pmw.tinylog.Logger;
-
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.github.albahrani.aquacontrol.logger.Logger;
 import com.github.albahrani.aquacontrol.server.json.JSONPlan;
 import com.github.albahrani.dimmingplan.DimmingPlan;
 import com.github.albahrani.dimmingplan.DimmingPlanChannel;

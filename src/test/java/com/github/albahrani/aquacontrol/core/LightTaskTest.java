@@ -28,6 +28,8 @@ import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.albahrani.dimmingplan.DimmingPlan;
@@ -35,15 +37,20 @@ import com.github.albahrani.dimmingplan.DimmingPlanChannel;
 
 public class LightTaskTest {
 
-	@Test
-	public void testNotInitialized() {
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
 
-		try {
-			LightTask lightTask = new LightTask();
-			lightTask.executePlanFor(LocalTime.of(0, 0));
-			fail("Should throw an exception.");
-		} catch (Throwable t) {
-			// the exception is wanted here
+    @Test
+    public void testNotInitialized() {
+
+        try {
+            LightTask lightTask = new LightTask();
+            lightTask.executePlanFor(LocalTime.of(0, 0));
+            fail("Should throw an exception.");
+        } catch (Throwable t) {
+            // the exception is wanted here
 		}
 	}
 
@@ -56,7 +63,6 @@ public class LightTaskTest {
 			lightTask.setDaemon(daemon);
 			lightTask.run();
 		} catch (Throwable t) {
-			t.printStackTrace();
 			fail("Unexpected error:" + t.getMessage());
 		}
 	}

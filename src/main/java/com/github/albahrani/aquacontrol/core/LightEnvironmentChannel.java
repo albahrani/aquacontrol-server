@@ -20,8 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.pmw.tinylog.Logger;
-
+import com.github.albahrani.aquacontrol.logger.Logger;
 import com.github.albahrani.aquacontrol.core.environment.PWMControllerConnector;
 import com.pi4j.gpio.extension.pca.PCA9685GpioProvider;
 import com.pi4j.io.gpio.Pin;

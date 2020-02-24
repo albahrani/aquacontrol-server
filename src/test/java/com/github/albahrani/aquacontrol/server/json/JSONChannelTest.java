@@ -24,6 +24,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,15 +33,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JSONChannelTest {
 
-	@Test
-	public void testToString() {
-		JSONChannel json = new JSONChannel();
-		json.setId("2");
-		List<JSONTimeValuePair> timetable = new ArrayList<>();
-		JSONTimeValuePair tte = new JSONTimeValuePair();
-		tte.setTime(LocalTime.of(6, 30));
-		tte.setPerc(12.0d);
-		timetable.add(tte);
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
+
+    @Test
+    public void testToString() {
+        JSONChannel json = new JSONChannel();
+        json.setId("2");
+        List<JSONTimeValuePair> timetable = new ArrayList<>();
+        JSONTimeValuePair tte = new JSONTimeValuePair();
+        tte.setTime(LocalTime.of(6, 30));
+        tte.setPerc(12.0d);
+        timetable.add(tte);
 
 		JSONTimeValuePair tte2 = new JSONTimeValuePair();
 		tte2.setTime(LocalTime.of(12, 00));

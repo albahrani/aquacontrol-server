@@ -15,17 +15,24 @@
  */
 package com.github.albahrani.aquacontrol.server.rest;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.albahrani.aquacontrol.server.rest.RESTServer;
 
 public class RESTServerTest {
 
-	@Test
-	public void testStartupShutdown() {
-		RESTServer server = new RESTServer();
-		server.start();
-		server.shutdown();
-	}
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
+
+    @Test
+    public void testStartupShutdown() {
+        RESTServer server = new RESTServer();
+        server.start();
+        server.shutdown();
+    }
 
 }

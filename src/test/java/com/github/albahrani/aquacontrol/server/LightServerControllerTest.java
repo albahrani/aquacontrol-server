@@ -30,6 +30,8 @@ import java.io.File;
 import java.time.LocalTime;
 import java.util.Optional;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.albahrani.aquacontrol.core.LightEnvironment;
@@ -39,17 +41,23 @@ import com.github.albahrani.aquacontrol.server.json.JSONPlan;
 import com.github.albahrani.aquacontrol.server.rest.RESTServer;
 import com.github.albahrani.dimmingplan.DimmingPlan;
 import com.github.albahrani.dimmingplan.DimmingPlanChannel;
+import org.pmw.tinylog.Level;
 
 public class LightServerControllerTest {
 
-	@Test
-	public void testNoErrorOnEmptyPlanExecution() {
+    @BeforeClass
+    public static void beforeClass() {
+        Logger.setActive(false);
+    }
 
-		LightServerController daemon = new LightServerController();
-		LightEnvironment environment = mock(LightEnvironment.class);
-		daemon.setLightEnvironment(environment);
-		DimmingPlan plan = mock(DimmingPlan.class);
-		daemon.setLightPlan(plan);
+    @Test
+    public void testNoErrorOnEmptyPlanExecution() {
+
+        LightServerController daemon = new LightServerController();
+        LightEnvironment environment = mock(LightEnvironment.class);
+        daemon.setLightEnvironment(environment);
+        DimmingPlan plan = mock(DimmingPlan.class);
+        daemon.setLightPlan(plan);
 
 		try {
 			LightTask lightTask = new LightTask();
