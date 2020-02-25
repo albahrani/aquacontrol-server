@@ -25,90 +25,65 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.util.Timer;
 
 import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class LightTimerTest {
 
-    @BeforeClass
-    public static void beforeClass() {
-        Logger.setActive(false);
-    }
+	@BeforeClass
+	public static void beforeClass() {
+		Logger.setActive(false);
+	}
 
-    @Test
-    public void testStart() {
-        Timer timer = mock(Timer.class);
-        LightTaskDaemon daemon = mock(LightTaskDaemon.class);
+	private Timer timer = mock(Timer.class);
+	private LightTaskDaemon daemon = mock(LightTaskDaemon.class);
+	private LightTimer lightTimer = new LightTimer();
 
-        LightTimer lightTimer = new LightTimer();
-        lightTimer.setTimer(timer);
+	@Before
+	public void before() {
+		lightTimer.setTimer(timer);
+	}
 
-        lightTimer.start(daemon);
+	@Test
+	public void testStart() {
+		lightTimer.start(daemon);
 
 		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(1000l));
-		verifyNoMoreInteractions(timer);
-		verifyZeroInteractions(daemon);
+		verifyNoMoreInteractions(timer, daemon);
 	}
 
 	@Test
 	public void testStartTwice() {
-		Timer timer = mock(Timer.class);
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
-
-		LightTimer lightTimer = new LightTimer();
-		lightTimer.setTimer(timer);
-
 		lightTimer.start(daemon);
 		lightTimer.start(daemon);
 
 		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(1000l));
-		verifyNoMoreInteractions(timer);
-		verifyZeroInteractions(daemon);
+		verifyNoMoreInteractions(timer, daemon);
 	}
 
 	@Test
 	public void testStopWithoutStart() {
-		Timer timer = mock(Timer.class);
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
-
-		LightTimer lightTimer = new LightTimer();
-		lightTimer.setTimer(timer);
-
 		lightTimer.stop();
 
-		verifyZeroInteractions(timer);
-		verifyZeroInteractions(daemon);
+		verifyNoMoreInteractions(timer, daemon);
 	}
 
 	@Test
 	public void testStartStop() {
-		Timer timer = mock(Timer.class);
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
-
-		LightTimer lightTimer = new LightTimer();
-		lightTimer.setTimer(timer);
-
 		lightTimer.start(daemon);
 		lightTimer.stop();
 
 		verify(timer).scheduleAtFixedRate(any(LightTask.class), eq(100l), eq(1000l));
-		verifyNoMoreInteractions(timer);
-		verifyZeroInteractions(daemon);
+		verifyNoMoreInteractions(timer, daemon);
 	}
 
 	@Test
 	public void testShutdownWithoutStart() {
-		Timer timer = mock(Timer.class);
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
-
-		LightTimer lightTimer = new LightTimer();
-		lightTimer.setTimer(timer);
-
 		lightTimer.shutdown();
 
 		verify(timer).cancel();
-		verifyNoMoreInteractions(timer);
-		verifyZeroInteractions(daemon);
+		verifyNoMoreInteractions(timer, daemon);
 	}
 
 }

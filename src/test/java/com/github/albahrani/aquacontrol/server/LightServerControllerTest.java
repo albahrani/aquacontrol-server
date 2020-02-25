@@ -31,6 +31,8 @@ import java.time.LocalTime;
 import java.util.Optional;
 
 import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,197 +47,92 @@ import org.pmw.tinylog.Level;
 
 public class LightServerControllerTest {
 
-    @BeforeClass
-    public static void beforeClass() {
-        Logger.setActive(false);
-    }
+	private LightEnvironment environment = mock(LightEnvironment.class);
+	private DimmingPlan plan = mock(DimmingPlan.class);
+	private DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
+	private LightTimer timer = mock(LightTimer.class);
+	private RESTServer server = mock(RESTServer.class);
+	private JSONPlan jsonPlan = mock(JSONPlan.class);
+	private LightPlanStorage lightPlanStorage = mock(LightPlanStorage.class);
+	private LightServerController daemon = new LightServerController();
 
-    @Test
-    public void testNoErrorOnEmptyPlanExecution() {
 
-        LightServerController daemon = new LightServerController();
-        LightEnvironment environment = mock(LightEnvironment.class);
-        daemon.setLightEnvironment(environment);
-        DimmingPlan plan = mock(DimmingPlan.class);
-        daemon.setLightPlan(plan);
-
-		try {
-			LightTask lightTask = new LightTask();
-			lightTask.setDaemon(daemon);
-
-			lightTask.executePlanFor(LocalTime.of(0, 0));
-		} catch (Throwable t) {
-			fail(t.getMessage());
-		}
+	@BeforeClass
+	public static void beforeClass() {
+		Logger.setActive(false);
 	}
 
-	@Test
-	public void testNotRunningOnRaspi() {
-		boolean runningOnRaspberry = LightServer.isRunningOnRaspberry();
-		// TODO mock the SystemInfo class
-		assertEquals(false, runningOnRaspberry);
-	}
-
-	@Test
-	public void testArguments() {
-
-		String[] args = new String[] { "-c", "C:/temp/config.json", "-p", "C:/temp/plan.json" };
-
-		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
-		assertNotNull(optionalParseArgs);
-		assertTrue(optionalParseArgs.isPresent());
-		LightServerArgs parseArgs = optionalParseArgs.get();
-		assertNotNull(parseArgs);
-		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
-		assertEquals(Optional.of(new File("C:/temp/plan.json")), parseArgs.getLightPlanFile());
-	}
-
-	@Test
-	public void testArgumentsOneMissing() {
-
-		String[] args = new String[] { "-c", "C:/temp/config.json" };
-
-		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
-		assertNotNull(optionalParseArgs);
-		assertTrue(optionalParseArgs.isPresent());
-		LightServerArgs parseArgs = optionalParseArgs.get();
-		assertNotNull(parseArgs);
-		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
-		assertNotNull(parseArgs.getLightPlanFile());
-		assertFalse(parseArgs.getLightPlanFile().isPresent());
-	}
-
-	@Test
-	public void testArgumentsWrongParameter() {
-
-		String[] args = new String[] { "-c", "C:/temp/config.json", "-p", "C:/temp/plan.json", "-x", "Wrong" };
-
-		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
-		assertNotNull(optionalParseArgs);
-		assertFalse(optionalParseArgs.isPresent());
-	}
-
-	@Test
-	public void testArgumentsHelpParameter() {
-
-		String[] args = new String[] { "-h" };
-
-		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
-		assertNotNull(optionalParseArgs);
-		assertFalse(optionalParseArgs.isPresent());
+	@Before
+	public void before() {
+		daemon.setLightEnvironment(environment);
+		daemon.setLightPlan(plan);
+		daemon.setServer(server);
+		daemon.setTimer(timer);
+		daemon.setLightPlanStorage(lightPlanStorage);
 	}
 
 	@Test
 	public void testSetForcedValue() {
-		DimmingPlan plan = mock(DimmingPlan.class);
-		DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
 		when(plan.channel("0x20")).thenReturn(channel);
 
-		LightServerController daemon = new LightServerController();
-		daemon.setLightPlan(plan);
 		daemon.setForcedValue("0x20", 10.0d);
 		verify(plan).channel("0x20");
-		verifyNoMoreInteractions(plan);
 		verify(channel).pin(10.0d);
-		verifyNoMoreInteractions(channel);
 	}
 
 	@Test
 	public void testClearForcedValue() {
-		DimmingPlan plan = mock(DimmingPlan.class);
-		DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
 		when(plan.channel("0x20")).thenReturn(channel);
 
-		LightServerController daemon = new LightServerController();
-		daemon.setLightPlan(plan);
 		daemon.clearForcedValue("0x20");
 		verify(plan).channel("0x20");
-		verifyNoMoreInteractions(plan);
 		verify(channel).unpin();
-		verifyNoMoreInteractions(channel);
 	}
 
 	@Test
 	public void testStart() {
-		LightTimer timer = mock(LightTimer.class);
-		RESTServer server = mock(RESTServer.class);
-
-		LightServerController daemon = new LightServerController();
-		daemon.setServer(server);
-		daemon.setTimer(timer);
 		daemon.start();
-
 		verify(server).start();
-		verifyNoMoreInteractions(server);
 		verify(timer).start(daemon);
-		verifyNoMoreInteractions(timer);
 	}
 
 	@Test
 	public void testShutdown() {
-		LightTimer timer = mock(LightTimer.class);
-		RESTServer server = mock(RESTServer.class);
-		LightEnvironment env = mock(LightEnvironment.class);
-
-		LightServerController daemon = new LightServerController();
-		daemon.setServer(server);
-		daemon.setTimer(timer);
-		daemon.setLightEnvironment(env);
 		daemon.shutdown();
 
 		verify(server).shutdown();
-		verifyNoMoreInteractions(server);
 		verify(timer).shutdown();
-		verifyNoMoreInteractions(timer);
-		verify(env).shutdown();
-		verifyNoMoreInteractions(env);
+		verify(environment).shutdown();
 	}
 
 	@Test
 	public void testPause() {
-		LightTimer timer = mock(LightTimer.class);
-		RESTServer server = mock(RESTServer.class);
-
-		LightServerController daemon = new LightServerController();
-		daemon.setServer(server);
-		daemon.setTimer(timer);
 		daemon.pause();
-
-		verifyZeroInteractions(server);
 		verify(timer).stop();
-		verifyNoMoreInteractions(timer);
 	}
 	
 	@Test
 	public void testResume() {
-		LightTimer timer = mock(LightTimer.class);
-		RESTServer server = mock(RESTServer.class);
-
-		LightServerController daemon = new LightServerController();
-		daemon.setServer(server);
-		daemon.setTimer(timer);
 		daemon.resume();
 
-		verifyZeroInteractions(server);
 		verify(timer).start(daemon);
-		verifyNoMoreInteractions(timer);
+
 	}
-	
+
 	@Test
 	public void testUpdateLightPlan() {
-		
-		LightPlanStorage lightPlanStorage = mock(LightPlanStorage.class);
 		Optional<File> file = Optional.of(new File("test"));
 		when(lightPlanStorage.getLightPlanFile()).thenReturn(file);
-		JSONPlan jsonPlan = mock(JSONPlan.class);
-		
-		LightServerController daemon = new LightServerController();
-		daemon.setLightPlanStorage(lightPlanStorage);
+
 		daemon.updateLightPlan(jsonPlan);
-		
+
 		verify(lightPlanStorage).setJsonLightPlan(jsonPlan);
 		verify(lightPlanStorage).getLightPlanFile();
 		verify(lightPlanStorage).storeLightPlanToFile(file);
-		verifyNoMoreInteractions(lightPlanStorage);
+	}
+
+	@After
+	public void after() {
+		verifyNoMoreInteractions(environment, plan, channel, timer, server, jsonPlan, lightPlanStorage);
 	}
 }

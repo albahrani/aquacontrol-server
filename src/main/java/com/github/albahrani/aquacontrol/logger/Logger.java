@@ -15,8 +15,6 @@
  */
 package com.github.albahrani.aquacontrol.logger;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 public class Logger {
 
     private static boolean active = true;

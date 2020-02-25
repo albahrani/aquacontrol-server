@@ -15,9 +15,8 @@
  */
 package com.github.albahrani.aquacontrol.server;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -127,4 +127,59 @@ public class LightServerTest {
 		inOrder.verify(connector).setPwmValue(anySet(), eq(0));
 	}
 
+	@Test
+	public void testNotRunningOnRaspi() {
+		boolean runningOnRaspberry = LightServer.isRunningOnRaspberry();
+		// TODO mock the SystemInfo class
+		assertEquals(false, runningOnRaspberry);
+	}
+
+	@Test
+	public void testArguments() {
+
+		String[] args = new String[]{"-c", "C:/temp/config.json", "-p", "C:/temp/plan.json"};
+
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertTrue(optionalParseArgs.isPresent());
+		LightServerArgs parseArgs = optionalParseArgs.get();
+		assertNotNull(parseArgs);
+		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
+		assertEquals(Optional.of(new File("C:/temp/plan.json")), parseArgs.getLightPlanFile());
+	}
+
+	@Test
+	public void testArgumentsOneMissing() {
+
+		String[] args = new String[]{"-c", "C:/temp/config.json"};
+
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertTrue(optionalParseArgs.isPresent());
+		LightServerArgs parseArgs = optionalParseArgs.get();
+		assertNotNull(parseArgs);
+		assertEquals(Optional.of(new File("C:/temp/config.json")), parseArgs.getConfigFile());
+		assertNotNull(parseArgs.getLightPlanFile());
+		assertFalse(parseArgs.getLightPlanFile().isPresent());
+	}
+
+	@Test
+	public void testArgumentsWrongParameter() {
+
+		String[] args = new String[]{"-c", "C:/temp/config.json", "-p", "C:/temp/plan.json", "-x", "Wrong"};
+
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertFalse(optionalParseArgs.isPresent());
+	}
+
+	@Test
+	public void testArgumentsHelpParameter() {
+
+		String[] args = new String[]{"-h"};
+
+		Optional<LightServerArgs> optionalParseArgs = LightServer.parseArgs(args);
+		assertNotNull(optionalParseArgs);
+		assertFalse(optionalParseArgs.isPresent());
+	}
 }

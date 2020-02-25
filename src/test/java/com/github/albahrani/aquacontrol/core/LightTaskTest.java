@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.github.albahrani.aquacontrol.logger.Logger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -37,31 +39,42 @@ import com.github.albahrani.dimmingplan.DimmingPlanChannel;
 
 public class LightTaskTest {
 
-    @BeforeClass
-    public static void beforeClass() {
-        Logger.setActive(false);
-    }
+	@BeforeClass
+	public static void beforeClass() {
+		Logger.setActive(false);
+	}
 
-    @Test
-    public void testNotInitialized() {
+	private LightTaskDaemon daemon = mock(LightTaskDaemon.class);
+	private LightEnvironment environment = mock(LightEnvironment.class);
+	private LightEnvironmentChannel environmentChannel = mock(LightEnvironmentChannel.class);
+	private DimmingPlan plan = mock(DimmingPlan.class);
+	private DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
+	private LightTask lightTask = new LightTask();
 
-        try {
-            LightTask lightTask = new LightTask();
-            lightTask.executePlanFor(LocalTime.of(0, 0));
-            fail("Should throw an exception.");
-        } catch (Throwable t) {
-            // the exception is wanted here
+	@Before
+	public void before() {
+		lightTask.setDaemon(daemon);
+	}
+
+	@Test
+	public void testNotInitialized() {
+
+		try {
+			lightTask.executePlanFor(LocalTime.of(0, 0));
+			fail("Should throw an exception.");
+		} catch (Throwable t) {
+			// the exception is wanted here
+			verify(daemon).getLightPlan();
+			verify(daemon).getLightEnvironment();
 		}
 	}
 
 	@Test
 	public void testRunWithoutPlan() {
 		try {
-			LightTaskDaemon daemon = mock(LightTaskDaemon.class);
-
-			LightTask lightTask = new LightTask();
-			lightTask.setDaemon(daemon);
 			lightTask.run();
+			verify(daemon).getLightPlan();
+			verify(daemon).getLightEnvironment();
 		} catch (Throwable t) {
 			fail("Unexpected error:" + t.getMessage());
 		}
@@ -70,69 +83,53 @@ public class LightTaskTest {
 	@Test
 	public void testPlanPercentagePresent() {
 
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
-
-		LightEnvironment environment = mock(LightEnvironment.class);
-		when(daemon.getLightEnvironment()).thenReturn(environment);
-
-		LightEnvironmentChannel environmentChannel = mock(LightEnvironmentChannel.class);
 		when(environment.channels()).thenReturn(Stream.of(environmentChannel));
 		when(environmentChannel.getId()).thenReturn("0x40");
 
-		DimmingPlan plan = mock(DimmingPlan.class);
 		Set<String> channelNames = new HashSet<>();
 		channelNames.add("0x40");
-		DimmingPlanChannel channel = mock(DimmingPlanChannel.class);
 		when(plan.getChannelNames()).thenReturn(channelNames);
 		when(plan.channel("0x40")).thenReturn(channel);
 		LocalTime time = LocalTime.of(12, 0);
 		when(channel.getPercentage(time)).thenReturn(OptionalDouble.of(100.0d));
 		when(daemon.getLightPlan()).thenReturn(plan);
-
-		LightTask lightTask = new LightTask();
-		lightTask.setDaemon(daemon);
+		when(daemon.getLightEnvironment()).thenReturn(environment);
 
 		lightTask.executePlanFor(time);
+
+		verify(plan).channel("0x40");
+		verify(daemon).getLightPlan();
+		verify(daemon).getLightEnvironment();
 		verify(environment).channels();
-		verifyNoMoreInteractions(environment);
 		verify(environmentChannel).getId();
 		verify(environmentChannel).percentage(eq(100.0d, 0.01d));
-		verifyNoMoreInteractions(environmentChannel);
+		verify(channel).getPercentage(time);
 	}
 
 	@Test
 	public void testPlanPercentageNotPresent() {
 
-		LightEnvironmentChannel envChannel = mock(LightEnvironmentChannel.class);
-		when(envChannel.getId()).thenReturn("0x40");
-
-		LightEnvironment environment = mock(LightEnvironment.class);
-		when(environment.channels()).thenReturn(Stream.of(envChannel));
-
-		DimmingPlanChannel planChannel = mock(DimmingPlanChannel.class);
+		when(environmentChannel.getId()).thenReturn("0x40");
+		when(environment.channels()).thenReturn(Stream.of(environmentChannel));
 		LocalTime time = LocalTime.of(12, 0);
-		when(planChannel.getPercentage(time)).thenReturn(OptionalDouble.empty());
-
-		DimmingPlan plan = mock(DimmingPlan.class);
-		when(plan.channel("0x40")).thenReturn(planChannel);
-
-		LightTaskDaemon daemon = mock(LightTaskDaemon.class);
+		when(channel.getPercentage(time)).thenReturn(OptionalDouble.empty());
+		when(plan.channel("0x40")).thenReturn(channel);
 		when(daemon.getLightEnvironment()).thenReturn(environment);
 		when(daemon.getLightPlan()).thenReturn(plan);
 
-		LightTask lightTask = new LightTask();
-		lightTask.setDaemon(daemon);
-
 		lightTask.executePlanFor(time);
 
+		verify(daemon).getLightPlan();
+		verify(daemon).getLightEnvironment();
 		verify(environment).channels();
-		verifyNoMoreInteractions(environment);
-		verify(envChannel).getId();
-		verify(envChannel).percentage(eq(0.0d, 0.01d));
-		verifyNoMoreInteractions(envChannel);
+		verify(environmentChannel).getId();
+		verify(environmentChannel).percentage(eq(0.0d, 0.01d));
 		verify(plan).channel("0x40");
-		verifyNoMoreInteractions(plan);
-		verify(planChannel).getPercentage(time);
-		verifyNoMoreInteractions(planChannel);
+		verify(channel).getPercentage(time);
+	}
+
+	@After
+	public void after() {
+		verifyNoMoreInteractions(daemon, environment, environmentChannel, plan, channel);
 	}
 }
