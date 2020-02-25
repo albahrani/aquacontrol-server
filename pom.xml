@@ -92,12 +92,12 @@
 		<dependency>
 			<groupId>com.github.albahrani</groupId>
 			<artifactId>dimmingplan</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>master-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.albahrani</groupId>
 			<artifactId>pi4j-rest-sysinfo</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>master-SNAPSHOT</version>
 		</dependency>
 		<!-- Override netty version provided by RestExpress because of CVE-2016-4970 -->
 		<dependency>
