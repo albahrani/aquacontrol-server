@@ -98,7 +98,13 @@
 			<groupId>com.github.albahrani</groupId>
 			<artifactId>pi4j-rest-sysinfo</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>	
+		</dependency>
+		<!-- Override netty version provided by RestExpress because of CVE-2016-4970 -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.45.Final</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
