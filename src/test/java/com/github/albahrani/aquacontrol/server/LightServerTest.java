@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.github.albahrani.aquacontrol.logger.Logger;
+import com.github.albahrani.aquacontrol.server.rest.RESTServer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -50,6 +51,8 @@ public class LightServerTest {
         Logger.setActive(false);
     }
 
+	private RESTServer restServer = mock(RESTServer.class);
+
     @Test
     public void testStartLightServer() {
         PWMControllerConnector pwmControllerConnector = mock(PWMControllerConnector.class);
@@ -57,6 +60,7 @@ public class LightServerTest {
         assertNotNull(optionalServer);
         assertTrue(optionalServer.isPresent());
         LightServerController server = optionalServer.get();
+		server.setServer(restServer);
         server.start();
         server.shutdown();
 		
