@@ -1,9 +1,11 @@
-[![](https://jitci.com/gh/albahrani/aquacontrol-server/svg)](https://jitci.com/gh/albahrani/aquacontrol-server)
+[![Release](https://jitpack.io/v/albahrani/aquacontrol-server.svg)](https://jitpack.io/#albahrani/aquacontrol-server)
+[![Build](https://jitci.com/gh/albahrani/aquacontrol-server/svg)](https://jitci.com/gh/albahrani/aquacontrol-server)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.github.albahrani.aquacontrol%3Aaquacontrol-server&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.albahrani.aquacontrol%3Aaquacontrol-server)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e2c4ba7ebd164900abb1debfb1fb1a78)](https://app.codacy.com/app/albahrani/aquacontrol-server?utm_source=github.com&utm_medium=referral&utm_content=albahrani/aquacontrol-server&utm_campaign=badger)
 [![codebeat badge](https://codebeat.co/badges/53540457-4882-4db6-b560-6a85baee9727)](https://codebeat.co/projects/github-com-albahrani-aquacontrol-server-master)
 [![Known Vulnerabilities](https://snyk.io/test/github/albahrani/aquacontrol-server/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/albahrani/aquacontrol-server?targetFile=pom.xml)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server?ref=badge_shield)
+[![Hits-of-Code](https://hitsofcode.com/github/albahrani/aquacontrol-server)](https://hitsofcode.com/view/github/albahrani/aquacontrol-server)
+
 ===============
 aquacontrol-server
 ===============
