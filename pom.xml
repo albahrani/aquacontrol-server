@@ -179,6 +179,51 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.6.0.1398</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.4</version>
+            </plugin>                 
+        </plugins>
+    </build>
+  <profiles>
+    <profile>
+      <id>coverage</id>
+      <properties>
+         <sonar.projectKey>albahrani_aquacontrol-server</sonar.projectKey>
+         <sonar.organization>albahrani</sonar.organization>               
+         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+      </properties>      
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>   
 </project>
