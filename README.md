@@ -6,7 +6,6 @@
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falbahrani%2Faquacontrol-server?ref=badge_shield)
 [![Hits-of-Code](https://hitsofcode.com/github/albahrani/aquacontrol-server)](https://hitsofcode.com/view/github/albahrani/aquacontrol-server)
 
-===============
 aquacontrol-server
 ===============
 A pi4j based aquarium management server. It uses the [Pi4J](https://github.com/Pi4J/pi4j) PCA9685GpioProvider to generate PWM signals for light control. It is accessible over REST service interfaces over the integrated [RESTExpress](https://github.com/RestExpress/RestExpress) server.
