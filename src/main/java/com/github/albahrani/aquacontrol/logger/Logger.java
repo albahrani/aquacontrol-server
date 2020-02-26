@@ -37,14 +37,14 @@ public class Logger {
         org.pmw.tinylog.Logger.error(s);
     }
 
-    public static void error(Exception e, String s) {
+    public static void error(Throwable e, String s) {
         if (!Logger.active) {
             return;
         }
         org.pmw.tinylog.Logger.error(e, s);
     }
 
-    public static void error(Exception e, String s, Object... objects) {
+    public static void error(Throwable e, String s, Object... objects) {
         if (!Logger.active) {
             return;
         }

@@ -15,6 +15,7 @@
  */
 package com.github.albahrani.aquacontrol.server.rest;
 
+import com.github.albahrani.aquacontrol.logger.Logger;
 import org.restexpress.RestExpress;
 
 import com.github.albahrani.aquacontrol.server.LightServer;
@@ -81,8 +82,12 @@ public class RESTServer {
 
         this.server.addMessageObserver(new LogMessageObserver());
 
-        this.server.bind();
-    }
+		try {
+			this.server.bind();
+		} catch (Throwable throwable) {
+			Logger.error(throwable, "Could not start RESTServer.");
+		}
+	}
 
 	public void shutdown() {
 		this.server.shutdown();
