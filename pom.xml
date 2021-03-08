@@ -97,7 +97,7 @@
 		<dependency>
 			<groupId>com.github.albahrani</groupId>
 			<artifactId>pi4j-rest-sysinfo</artifactId>
-			<version>master-SNAPSHOT</version>
+			<version>snyk-fix-ed519ac97244eec09c80d19de99fcc73-SNAPSHOT</version>
 		</dependency>
 		<!-- Override netty version provided by RestExpress because of CVE-2016-4970 -->
 		<dependency>
