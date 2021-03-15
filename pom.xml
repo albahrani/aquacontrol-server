@@ -101,9 +101,9 @@
 		</dependency>
 		<!-- Override netty version provided by RestExpress because of CVE-2016-4970 -->
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>4.1.59.Final</version>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-all</artifactId>
+                        <version>4.1.60.Final</version>
 		</dependency>
 	</dependencies>
 	<repositories>
